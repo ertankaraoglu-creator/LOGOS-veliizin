@@ -830,7 +830,23 @@ def pencere(api):
                               maximized=True, text_select=True, confirm_close=False)
     api._pencere = w
     w.events.shown += _acilis_kapat
+    _pencere_sinamasi(api, w)
     webview.start(localization=PENCERE_DILI)
+
+
+def _pencere_sinamasi(api, w):
+    """Yalnız paket sınamasında (paket/duman.py --pencere; LV_PENCERE_SINA = işaret dosyası): arayüz Python'a bağlanınca (baslangic çağrısı
+    pencereden geldi) işaret dosyası yazılır, LV_PENCERE_SINA_SURE saniye sonra pencere kapanır. Bu arada ikinci açılış denenir."""
+    yol = os.environ.get('LV_PENCERE_SINA')
+    if not yol: return
+    def bekle():
+        for _ in range(1200):
+            if api._bagli:
+                with open(yol, 'w', encoding='utf-8') as f: f.write('baglandi ' + surum.SURUM)
+                time.sleep(float(os.environ.get('LV_PENCERE_SINA_SURE') or 8)); w.destroy(); return
+            time.sleep(0.1)
+        w.destroy()
+    threading.Thread(target=bekle, daemon=True).start()
 
 
 def paket_gunlugu():

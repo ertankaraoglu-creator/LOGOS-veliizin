@@ -1,0 +1,105 @@
+# LOGOS Veli İzin paketi (LOGOS Disiplin'in paket.yml'inden): Windows'ta tek LOGOS-Veli-Izin.exe + kurulum paketi; ikisi de duman sınamasından
+# geçer (paket açılıyor mu, kasa / e-Okul / dilekçe / öğrenci belgesi paketin içinde çalışıyor mu, pencere arayüzü Python'a bağlanıyor mu,
+# ikinci açılış birinciyi öne getirip çıkıyor mu).
+# Ne zaman: "paket" dalına itilince (git push -f origin HEAD:paket) ya da elle (Actions › Paket › Run workflow).
+# "yayin" dalına itilince ayrıca bu depoda sürüm (Releases) açılır: etiket v + uygulama/surum.py SURUM; not paket/SURUM_NOTU.md.
+name: Paket
+
+on:
+  push:
+    branches: [paket, yayin]
+  workflow_dispatch:
+
+concurrency:
+  group: paket-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    name: Derle (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 45
+    env:
+      PYTHONUTF8: '1'
+      LV_PENCERE_DENE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Gerekenler
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller
+      - name: Inno Setup (makinede hazır değilse kurulur)
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress }
+          "Inno Setup " + (Get-Item $iscc).VersionInfo.ProductVersion
+      - name: Birim sınamaları (kaynaktan)
+        run: python -W ignore -m unittest sinama.kasa_sina sinama.eokul_sina sinama.izin_sina sinama.api_sina
+      - name: Derle ve sına
+        run: python paket/derle.py
+      - name: Kurulum paketini sına (sessiz kur, aç, kaldır)
+        shell: pwsh
+        run: |
+          $k = "dist\dagitim\LOGOS-Veli-Izin-kurulum.exe"
+          Start-Process $k -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/TASKS=masaustu' -Wait
+          $exe = "$env:LOCALAPPDATA\Programs\LOGOS Veli İzin\LOGOS-Veli-Izin.exe"
+          if (-not (Test-Path $exe)) { throw "kurulmadı: $exe" }
+          python paket/duman.py "$exe"
+          $u = "$env:LOCALAPPDATA\Programs\LOGOS Veli İzin\unins000.exe"
+          Start-Process $u -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait
+          Start-Sleep -Seconds 3
+          if (Test-Path $exe) { throw "kaldırılmadı: $exe" }
+          "kurulum sınaması: TAMAM"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LOGOS-Veli-Izin-windows
+          path: dist/dagitim/*
+          retention-days: 30
+
+  yayinla:
+    name: Sürüm yayınla
+    if: github.ref == 'refs/heads/yayin'
+    needs: windows
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            uygulama/surum.py
+            paket/SURUM_NOTU.md
+      - name: Sürüm ve etiket
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          S=$(python3 -c "import re; print(re.search(r\"^SURUM = '([^']*)'\", open('uygulama/surum.py').read(), re.M).group(1))")
+          if gh release view "v$S" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "::error::v$S zaten yayınlandı: yeni sürüm için uygulama/surum.py SURUM'u artırın"; exit 1
+          fi
+          echo "SURUM=$S" >> "$GITHUB_ENV"
+          echo "::notice title=Sürüm::LOGOS Veli İzin $S yayınlanıyor (etiket v$S)"
+      - uses: actions/download-artifact@v4
+        with:
+          path: dagitim
+          merge-multiple: true
+      - name: Dağıtım adları
+        run: |
+          mkdir yayin
+          cp dagitim/LOGOS-Veli-Izin-kurulum.exe yayin/LOGOS-Veli-Izin-kurulum.exe
+          cp dagitim/LOGOS-Veli-Izin.exe yayin/LOGOS-Veli-Izin-windows.exe
+          ls -la yayin
+      - name: Bu depoda sürüm
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.SURUM }}
+          target_commitish: ${{ github.sha }}
+          name: LOGOS Veli İzin ${{ env.SURUM }}
+          files: yayin/*
+          body_path: paket/SURUM_NOTU.md
+          make_latest: true

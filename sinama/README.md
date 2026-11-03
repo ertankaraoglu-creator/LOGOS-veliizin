@@ -10,6 +10,8 @@ Her değişiklikten sonra hepsi koşulur. Okul, öğrenci ve veli adları uydurm
 | `api_sina.py` | Api baştan sona: kurulum, e-Okul aktarma, elle öğrenci, fotoğraf döndürme, dilekçe (önizleme, uyarı, kayıt no, PDF içeriği, güncelleme, süzgeçler, silme), devamsızlık bölümü ve son devamsızlık önerisi, okul logosu (PDF'te resim, gizleme), öğrenci belgesi (eksik alan, PDF içeriği), istatistik ve CSV, ayarlar, yeni yıl, kilit ve kurtarma, kasada ve günlükte açık veri yok | `python -m unittest sinama.api_sina -v` |
 | `ui_duman.py` | Arayüz (Playwright, tarayıcı kipi): kurulum (PDF'ten okul), aktarma, okul logosu (dosya seçme, önizleme, dilekçede), öğrenci penceresi, arama, veli çipleri, takvim ve yarım gün, önizleme, devamsızlık bölümü ve "Bunu yaz", kaydet, uyarı penceresi, "Diğer" kişi, Kayıtlar (ara, aç, sil), öğrenci belgesi (eksik alan), İstatistik, Ayarlar, kilit, kurtarma anahtarı, Hakkında | `python sinama/ui_duman.py [ekran_klasoru]` |
 
+| `paket/duman.py` | Derlenmiş paketin içinde: açılış ve sürüm, kasa, e-Okul (fotoğraflı), arama, logo, dilekçe (içerik, logo, devamsızlık), yeniden yazdır, öğrenci belgesi, istatistik, CSV, kilit, kurtarma, kasada ve günlükte açık veri yok; `--pencere`: WebView2 bağlantısı, ikinci açılış | `python paket/duman.py dist/LOGOS-Veli-Izin[.exe] [--pencere]` |
+
 Hepsi: `python -W ignore -m unittest sinama.kasa_sina sinama.eokul_sina sinama.izin_sina sinama.api_sina -v && python sinama/ui_duman.py`
 
 Tarayıcı kipi kendi kasasını `LV_AYAR_KLASORU` ile geçici klasörde açar; bilgisayardaki gerçek kasaya dokunmaz. `LV_SINAMA=1` yazıcıya

@@ -13,7 +13,7 @@ ve LOGOS Disiplin'in (`../LOGOS DİSİPLİN/CLAUDE.md`) kuralları burada da ge�
   "push edildi mi?" diye hatırlatır.
 - Ertan yalnız şu klasöre bakar: `/Volumes/BİLGİSAYARIM/DERS DAĞITIMM/LOGOS Veli İzin/` (GitHub deposunun birebir kopyası). Claude ürettiği her
   dosyayı bu klasörün içine, depodaki aynı yere yazar (bulut oturumunda `device_commit_files`; yol NFD: `cd "$HOME"/mnt/LOGOS\ Veli*`).
-- GitHub: `ertankaraoglu-creator/LOGOS-veliizin` (gizli, `main`). Bulut oturumunda iş buluttaki kopyada yapılır, commit + push; Mac'e
+- GitHub: `ertankaraoglu-creator/LOGOS-veliizin` (`main`; 03.11.2026'da **herkese açık** açıldı, Disiplin gizli: Ertan'a soruldu). Bulut oturumunda iş buluttaki kopyada yapılır, commit + push; Mac'e
   aynı commit'ler git paketiyle gider (`git bundle create <eski>..main` → `device_commit_files` → Mac'te `git pull <paket> main`, paket silinir),
   böylece Mac, GitHub ve bulut aynı kimlikleri taşır. Mac'teki VM'in GitHub şifresi yok; Mac'ten push Ertan'ın Terminal'inden olur.
 - Deneyler `raporlar/DENEYLER.md`'ye (tarih, komut, süre, sonuç, öğrenilen), her oturum `raporlar/OTURUM_RAPORU_<tarih>.md`'ye.
@@ -75,7 +75,14 @@ ve LOGOS Disiplin'in (`../LOGOS DİSİPLİN/CLAUDE.md`) kuralları burada da ge�
 - `sinama/`: `kasa_sina`, `eokul_sina`, `izin_sina`, `api_sina` (unittest), `ui_duman.py` (Playwright, tarayıcı kipi, bütün akış),
   `eokul_ornek.py` (uydurma PDF'ler), `ui_ortak.py`. Her değişiklikten sonra koşulur (`sinama/README.md`).
 - `raporlar/`: `SURUM_1_0.md` (yol haritası ve sıra), `DENEYLER.md`, oturum raporları.
-- `paket/`: `simge.png`, `acilis.png` (Disiplin'den); spec, derle, kurulum henüz yazılmadı (sırada).
+- `paket/` (Disiplin'in kalıbı): `veli_izin.spec` (PyInstaller tek dosya `LOGOS-Veli-Izin.exe`; Windows'ta açılış görseli; **pypdfium2 pakette
+  kalır**: fotoğraf kırpma sayfayı resme çevirir, Disiplin onu atıyordu), `derle.py` (derle + duman + `dist/dagitim/` + Inno Setup ile
+  `LOGOS-Veli-Izin-kurulum.exe`), `duman.py` (paketin içinde bütün akış, tarayıcı kipinde; `--pencere`: WebView2 penceresi Python'a bağlanıyor mu,
+  ikinci açılış çıkıyor mu; uygulamadaki kanca `ana._pencere_sinamasi`, yalnız `LV_PENCERE_SINA` varken), `kurulum.iss` (kullanıcı başına
+  `%LOCALAPPDATA%\Programs\LOGOS Veli İzin`; kaldırınca kasa silinmez), `SURUM_NOTU.md` (sürüm notu; her sürümde en üste).
+  GitHub derlemesi `.github/workflows/paket.yml`: `paket` dalına itince Windows'ta sınama + derleme + kur / aç / kaldır, çıktı artifact;
+  `yayin` dalı ayrıca bu depoda sürüm açar (`LOGOS-Veli-Izin-kurulum.exe`, `LOGOS-Veli-Izin-windows.exe`). Bulut oturumu Actions sayfasını
+  göremez; sonucu commit'in check-run'larından ve Releases'ten izler.
 
 ## Teknik notlar
 - Kasadaki veri `{okul, ayarlar, okul_logo, yil, yillar {yıl: {ogrenciler, siniflar, izinler, belgeler, sayac {izin, belge}, eokul}}, guvenlik, meta}`.

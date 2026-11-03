@@ -55,3 +55,8 @@ gizli): üç commit buluttan push edildi (Mac'teki commit'ler git paketiyle taş
   - Logo: Ayarlar'da önizleme; arayüz logoyu her önizlemede yeniden istemiyor.
 - Sınamalar: `izin_sina.DevamsizlikSina` (3), `api_sina` (bölümün PDF'teki yazıları, son devamsızlık önerisi, logo PDF'te resim ve gizleme,
   CSV sütunları), `ui_duman` (logo yükleme ve önizlemede görünmesi, devamsızlık bölümü, "Bunu yaz"). Hepsi geçiyor.
+
+## Ek (20:39) - paket ve yayın
+- Ertan: "yayınlayalım, yanımdaki PC ile deneyeceğim". `paket/` yazıldı (spec, derle, duman, kurulum, sürüm notu) ve `.github/workflows/paket.yml`.
+  Linux deneme paketi duman sınamasından geçti. Sürüm 0.1.1; `yayin` dalına itildi: Windows'ta derlenip bu depoda sürüm açılacak.
+- Fark edilen: depo herkese açık açılmış (Disiplin gizli). İçinde gerçek veri yok; gizli olsun mu, Ertan'a soruldu.
