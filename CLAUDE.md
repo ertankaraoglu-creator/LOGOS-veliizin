@@ -46,6 +46,7 @@ ve LOGOS Disiplin'in (`../LOGOS DİSİPLİN/CLAUDE.md`) kuralları burada da ge�
 - **Fareyle üstüne gelme** (Ertan 03.11.2026 21:11: "kutucuklar biraz daha mavi ve belirgin şekilde öne doğru boyutlansın"): tıklanan küçük kutular
   (düğme, çip, takvim günü, sayı kutusu, arama sonucu, menü) hafifçe büyür ve maviye döner; içinde yazı yazılan kartlar büyümez, yalnız kenarı
   ve gölgesi mavileşir (İstatistik kartları biraz yükselir). `@media (hover: hover)`, hareket azaltma tercihinde kapalı.
+- **Site** (Ertan 03.11.2026 21:21): https://dersdagitim.com/veli-izin, LOGOS deposunun `site/veli-izin.html`'i; indirme `/indir/veli-izin` bu deponun `releases/latest/download/LOGOS-Veli-Izin-kurulum.exe`'sine (depo gizlenirse kırılır). Görseller `deneyler/site_ekran.py <LOGOS/site>` (uydurma okul; ekrandaki kimlik numarası 10000000146); özellik eklenince görseller ve sayfanın metni de güncellenir. Sitede yeni görselin adı değişir (`/ekran/*` bir hafta önbellekte).
 - Açılış görseli (`paket/acilis.png`, Windows'ta paket açılırken) `paket/acilis_uret.py` ile üretilir (adı `surum.AD`'dan; Disiplin'den kopya
   "Disiplin" yazıyordu, Ertan 21:11).
 

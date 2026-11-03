@@ -17,6 +17,16 @@ Tarih, komut, süre, sonuç, öğrenilen. Gerçek veriyle yapılanlar yalnız sa
 - Sonuç: `eokul.oku` üçünü de 'genel', kimlik listesini 'kimlik' tanıdı; bütün alanlar beklenenle aynı; boş bırakılan fotoğraf None.
 - Öğrenilen: gerçek düzeni taklit için çerçeve dikdörtgeni şart (`_bloklar` önce dikdörtgenlere bakıyor).
 
+## D7 - 03.11.2026 - Site görselleri ve iki arayüz hatası (deneyler/site_ekran.py)
+- Komut: `python3 -W ignore deneyler/site_ekran.py ../logos/site` (uydurma okul, 33 dilekçe, 5 belge; ~1,5 dk).
+- Görseller iki gerçek hatayı gösterdi: (1) ilk açılışta boş kâğıdın anteti "T.C. / Müdürlüğüne" (kâğıt kilit ekranının arkasında okul
+  bilgisi gelmeden çiziliyordu); (2) logo gelene kadar kırık resim simgesi, boş kâğıtta logo hiç gelmiyordu. Düzeltildi.
+- İkinci düzeltmenin ilk hâli kilitliyken de logo istiyordu: cevap `{kilit: true}` kilit ekranını yeniden çizip yanlış şifre iletisini
+  siliyordu. `ui_duman` yakaladı (yanlış şifre adımı 30 sn'de düştü); logo artık kilitliyken istenmez, hatalı cevap boş diye saklanmaz.
+- Öğrenilen: `ui_duman`'a yeniden yükleme adımı eklendi (kilitle, yenile, aç, başlık okulun adıyla mı); yalnız oturumdaki önceki çizim yüzünden
+  ilk denetim hatayı görmüyordu. Düzeltmesiz koşuda yeni adım düşüyor. Chromium'un tarih kutusu `--lang=tr-TR` olmadan ABD düzeninde.
+  Görüntüdeki kimlik numarası gerçek bir kişiyle çakışabilir (uydurma numaraların denetim hanesi doğru): görsellerde 10000000146.
+
 ## D6 - 03.11.2026 - Bir kez çıkan sınama başarısızlığı
 - Birim sınamaları 1.0.0 değişikliklerinden hemen sonra bir kez "FAILED (failures=1)" verdi (çıktı kaydedilmemişti); ardından 9 koşuda hep geçti.
 - Hangisi olduğu bilinmiyor. Aday: `kasa_sina.test_sure` (açma süresi < 5 sn, yük altında). Bir daha çıkarsa çıktı `/tmp/birim_*.txt`'ye alınır.

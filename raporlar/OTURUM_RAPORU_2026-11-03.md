@@ -71,3 +71,12 @@ gizli): üç commit buluttan push edildi (Mac'teki commit'ler git paketiyle taş
 - Sorulan, cevap bekleyen: yazıcıya doğrudan gitti mi, gerçek e-Okul PDF'leri doğru geldi mi, eski PC'de açılış süresi.
 - **v1.0.0 yayınlandı** (dd1f06f; Windows derlemesi ve bütün sınamalar geçti): `LOGOS-Veli-Izin-kurulum.exe` 29,4 MB (sha256 6b5c6b9e…),
   `LOGOS-Veli-Izin-windows.exe` 27,8 MB. Kurulum dosyası Ertan'a sohbetten gönderildi. D6'daki başarısızlık Windows'ta çıkmadı.
+
+## Ek (21:21-21:50) - dersdagitim.com/veli-izin
+- Ertan: "Disiplin'de yaptığın gibi bir veli izin sekmesi; görseller, anlaşılır ve ilgi çekici tanıtım; link ver".
+- LOGOS deposunda `site/veli-izin.html` (Disiplin sayfasının düzeni: dört adımda dilekçe, beş görselli özellik, kağıtta dilekçe ve öğrenci
+  belgesi, Neden, sorular, Hemen başlayın), `site/indir/veli-izin.html` (bu deponun son sürümüne), ana sayfada duyuru bandı ve kardeş kutusu,
+  menü ve altbilgi bağlantıları, sitemap, IndexNow. Yayında: https://dersdagitim.com/veli-izin (97f7ea1).
+- Görseller `deneyler/site_ekran.py` ile; iki arayüz hatası buldu ve düzeltildi (D7; 8f018aa, 1505acb). Düzeltmeler 1.0.0 paketinde yok:
+  bir sonraki sürümde gider (ilk açılışta boş kâğıt "T.C. / Müdürlüğüne" görünebilir, öğrenci seçilince düzelir).
+- İndirme bağlantısı deponun herkese açık olmasına bağlı; gizlenirse Disiplin'deki gibi ayrı bir açık indirme deposu gerekir.
