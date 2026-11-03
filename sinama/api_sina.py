@@ -72,11 +72,12 @@ class ApiSina(unittest.TestCase):
         for s in ('KONAK KAYMAKAMLIĞI', 'ÇİĞDEM DEMİR', '902', 'EMİNE YILDIRIM', 'yakınının vefatı', '1,5 (bir buçuk) gün', '36. maddesi', 'Okul idaresi', 'Kayıt no', '3 gün özürlü, 1 gün özürsüz'):
             self.assertIn(s, m, s)
         self.assertNotIn('None', m)
+        self.assertIn('(öğrencinin annesi)', m); self.assertIn('Öğrencinin annesi', m); self.assertNotIn('öğrencinin anne)', m)
         # aynı güne ikinci dilekçe: önce uyarı, uyarılar görüldü deyince kayıt
         izin2 = dict(izin, veli={'ad': 'Ayşe Kaya', 'yakinlik': 'Diğer', 'yakinlik_aciklama': 'teyzesi', 'tel': '5321234567', 'tc': '10000000146'}, gunler={g2: 'tam'}, devamsizlik=None)
         r = A.izin_kaydet(izin2, yazdir=False); self.assertTrue(r['uyari_gerek']); self.assertIn('daha önce', r['uyarilar'][0])
         r = A.izin_kaydet(dict(izin2, uyarilari_gordum=True), yazdir=False); self.assertTrue(r['no_metni'].endswith('/0002')); id2 = r['id']
-        m = pdf_metni(r['pdf']); self.assertIn('Ayşe Kaya', m); self.assertIn('teyzesi', m); self.assertIn('0532 123 45 67', m); self.assertIn('10000000146', m)
+        m = pdf_metni(r['pdf']); self.assertIn('Ayşe Kaya', m); self.assertIn('Öğrencinin teyzesi', m); self.assertIn('0532 123 45 67', m); self.assertIn('10000000146', m)
         # var olan kaydı güncelleme: aynı numara
         r = A.izin_kaydet(dict(izin, id=id1, neden='hastaneye yatışı', uyarilari_gordum=True), yazdir=False); self.assertTrue(r['no_metni'].endswith('/0001'))
         self.assertEqual(A.izin(id1)['izin']['neden'], 'hastaneye yatışı'); self.assertEqual(len(A.izinler()['izinler']), 2)
@@ -90,6 +91,7 @@ class ApiSina(unittest.TestCase):
         self.assertEqual(A.ogrenci(1101)['ogrenci']['tc'], '10000000146')                                      # elle yazılan kimlik no öğrenciye kaydedildi
         m = pdf_metni(r['pdf']); o = A.ogrenci(1101)['ogrenci']
         for s in ('ÖĞRENCİ BELGESİ', 'İZMİR VALİLİĞİ', o['ad'], '10000000146', '11. Sınıf / C Şubesi', 'OKUL MÜDÜRÜ', 'MÜDÜR YARDIMCISI'): self.assertIn(s, m, s)
+        self.assertNotIn('LOGOS', m)                                                                           # resmî belgede program adı yok
         r = A.ogrenci_belgesi(901, {}, yazdir=False); self.assertTrue(r['ok']); self.assertEqual(len(A.belgeler()['belgeler']), 2)
         self.assertTrue(A.ogrenci_sil(901)['ayrildi'])                                                         # belgesi olan öğrenci silinmez, ayrıldı olur
         # ---- istatistik

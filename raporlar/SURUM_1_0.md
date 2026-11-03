@@ -22,8 +22,13 @@ Kapsam Ertan'ın (03.11.2026), sıra Claude'un; gerekçeler "Sıra" bölümünde
 6. Hakkında › açık kaynak listesi (Disiplin'deki `acik_kaynak.py`), sürüm notları, kurulumda `AppCopyright`.
 7. Mac paketi.
 
+## Cevaplanan sorular (Ertan 03.11.2026, 20:03)
+- Öğrenci belgesinin numarası yok: belgeye numara yazılmaz (Kayıtlar'daki "Sıra" yalnız LOGOS'un kendi listesi).
+- Dilekçe tek nüsha basılır.
+- Yarım gün e-Okul'a 0,5 gün işlenir: istatistik ve CSV böyle sayıyor (`izin.gun_degeri`).
+- Öğrenci belgesinin altında program adı yazmaz (kaldırıldı).
+- Dilekçede yakınlık iyelik ekiyle: "öğrencinin annesi / babası / vasisi" (`izin.yakinlik_metni`; Diğer'de "teyze" → "teyzesi").
+
 ## Açık sorular (Ertan'a)
-- Öğrenci belgesinin numarası (e-Okul'daki "Belge No" nasıl veriliyor; LOGOS kendi sayacını mı yazsın, boş mu bıraksın?).
-- Dilekçenin veliye bir kopyası veriliyor mu (iki nüsha basılsın mı)?
-- Yarım gün dilekçelerde e-Okul'a devamsızlık nasıl işleniyor (yarım gün = 0,5 mi)? İstatistik buna göre.
+- Dilekçenin sağ altındaki "LOGOS Veli İzin · tarih saat" satırı da kalksın mı? (Sol alttaki kayıt no Ayarlar'dan kapatılabiliyor.)
 - Kimlik numarası olmayan okullar (kimlik listesi yüklenmezse) için öğrenci belgesinde elle doldurma yeter mi?

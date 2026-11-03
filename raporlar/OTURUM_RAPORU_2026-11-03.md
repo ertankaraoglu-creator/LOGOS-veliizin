@@ -38,3 +38,11 @@ Aynı dil: Python + pywebview + tek HTML, LOGOS teması. Veri yalnız idarecinin
 ## Git
 İlk commit bu oturumda, Ertan'ın Mac'indeki `LOGOS Veli İzin` klasöründe. GitHub deposu henüz açılmadı: Ertan açınca `git remote add origin`
 ve push (hatırlatıldı).
+
+## Ek (20:03) - Ertan'ın ilk geri bildirimi
+- Öğrenci belgesinin numarası yok; altındaki "LOGOS Veli İzin" kaldırıldı.
+- İki nüshaya gerek yok. Yarım gün e-Okul'a 0,5 işleniyor (istatistik zaten böyle).
+- Dilekçede "öğrencinin anne" → "öğrencinin annesi" / "babası" / "vasisi"; Diğer'de yazılan akrabalık da ekleniyor ("teyze" → "teyzesi").
+  Elle girilmiş velinin yakınlığı ("teyzesi") seçim kutusunda Diğer + açıklama olarak açılıyor (önceden kutu boş kalıyordu).
+- Sınamalar: `izin_sina.YakinlikSina`, `api_sina` (PDF'te "annesi", öğrenci belgesinde "LOGOS" yok), `ui_duman` (önizlemede "annesi"). Hepsi geçiyor.
+- Soruldu: dilekçenin sağ altındaki program adı ve saat de kalksın mı?

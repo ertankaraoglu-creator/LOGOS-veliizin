@@ -92,6 +92,7 @@ def main(ekran_klasoru=None):
         else: sayfa.locator('.donem select').nth(1).select_option('sonra'); expect(sayfa.locator('#gunToplam')).to_have_text('toplam 1,5 gün')
         sayfa.click('#nedenler >> text=Cenaze')
         sayfa.wait_for_function("document.querySelector('#kagit .kg-metin') && document.querySelector('#kagit .kg-metin').textContent.includes('vefat')")
+        expect(sayfa.locator('#kagit')).to_contain_text('(öğrencinin annesi)'); expect(sayfa.locator('#kagit')).to_contain_text('Öğrencinin annesi')
         ekran.al(sayfa, 'dilekce-takvim')
         # kaydet (yazdırmadan)
         sayfa.click('.eylemler button:text-is("Kaydet")')

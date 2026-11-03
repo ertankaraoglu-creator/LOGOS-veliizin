@@ -224,6 +224,22 @@ def _devamsizlik(d):
     return out or None
 
 
+YAKINLIK_EKLI = {'anne': 'annesi', 'baba': 'babası', 'vasi': 'vasisi', 'veli': 'velisi', 'velisi': 'velisi', 'abla': 'ablası', 'abi': 'abisi',
+                 'ağabey': 'ağabeyi', 'agabey': 'ağabeyi', 'kardeş': 'kardeşi', 'dede': 'dedesi', 'nine': 'ninesi', 'babaanne': 'babaannesi',
+                 'anneanne': 'anneannesi', 'teyze': 'teyzesi', 'hala': 'halası', 'amca': 'amcası', 'dayı': 'dayısı', 'enişte': 'eniştesi',
+                 'yenge': 'yengesi', 'üvey anne': 'üvey annesi', 'üvey baba': 'üvey babası', 'koruyucu aile': 'koruyucu ailesi'}
+
+
+def yakinlik_metni(yakinlik, aciklama=''):
+    """Dilekçede "öğrencinin ..." diye geçen yakınlık, iyelik ekiyle (Ertan 03.11.2026: "öğrencinin anne" değil "annesi"):
+    Anne → annesi, Baba → babası, Vasi → vasisi; Diğer'de yazılan ("teyze" → teyzesi; "ablası" olduğu gibi). Küçük harf."""
+    from uygulama import eokul as E
+    y = ' '.join(str(yakinlik or '').split())
+    if y == 'Diğer': y = ' '.join(str(aciklama or '').split()) or 'yakını'
+    k = E.kucuk(y) or 'velisi'
+    return YAKINLIK_EKLI.get(k, k)
+
+
 def tel_duzelt(t):
     """'5321234567' → '0532 123 45 67'; boş → ''. 10 ya da 11 haneli değilse olduğu gibi (yurt dışı numara olabilir)."""
     s = re.sub(r'\D', '', str(t or ''))

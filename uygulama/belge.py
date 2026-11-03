@@ -136,7 +136,7 @@ def dilekce(yol, okul, ayarlar, kayit, ogrenci, sinif, logo=None):
     akis.append(Paragraph(metin, st(12, hiza=TA_JUSTIFY, girinti=12.5 * mm, satir=18)))
     akis.append(Spacer(1, 8 * mm))
     # bilgi tablosu
-    v = kayit['veli']; yak = v['yakinlik'] if v['yakinlik'] != 'Diğer' else (v.get('yakinlik_aciklama') or 'Yakını')
+    v = kayit['veli']; yak = IZ.yakinlik_metni(v.get('yakinlik'), v.get('yakinlik_aciklama'))
     alan_dal = sinif.get('alan', '') + (f" / {sinif.get('dal')}" if sinif.get('dal') else '')
     satirlar = [[('k', 'Adı soyadı'), ('v', ogrenci['ad']), ('k', 'Okul no'), ('v', str(ogrenci['no']))],
                 [('k', 'Sınıfı'), ('v', sinif.get('sinif', '')), ('k', 'Alanı'), ('v', E.baslik_harf(alan_dal) if alan_dal else '-')],
@@ -145,7 +145,7 @@ def dilekce(yol, okul, ayarlar, kayit, ogrenci, sinif, logo=None):
     d = kayit.get('devamsizlik')
     if d:
         satirlar.append([('k', 'Devamsızlık durumu'), ('v3', f"Bugüne kadar {IZ.sayi_metni(d.get('ozurlu', 0))} gün özürlü, {IZ.sayi_metni(d.get('ozursuz', 0))} gün özürsüz devamsızlığı vardır.")])
-    veren = f"{e(v['ad'])} (öğrencinin {e(E.kucuk(yak))})"
+    veren = f"{e(v['ad'])} (öğrencinin {e(yak)})"
     if v.get('tc'): veren += f", T.C. kimlik no {e(v['tc'])}"
     if v.get('tel'): veren += f", tel. {e(v['tel'])}"
     satirlar.append([('k', 'Dilekçeyi veren'), ('v3', veren)])
@@ -166,7 +166,7 @@ def dilekce(yol, okul, ayarlar, kayit, ogrenci, sinif, logo=None):
     # imza
     tel = Paragraph(f"Telefon: {e(v['tel'])}" if v.get('tel') else '', st(11))
     imza = Table([[Paragraph('İmza', st(9, renk=GRI))], [Paragraph(f"<b>{e(v['ad'])}</b>", st(11.5, hiza=TA_CENTER))],
-                  [Paragraph(f'Öğrencinin {e(E.kucuk(yak))}', st(11, hiza=TA_CENTER))]], colWidths=[64 * mm])
+                  [Paragraph(f'Öğrencinin {e(yak)}', st(11, hiza=TA_CENTER))]], colWidths=[64 * mm])
     imza.setStyle(TableStyle([('LINEBELOW', (0, 0), (0, 0), 0.7, colors.black), ('BOTTOMPADDING', (0, 0), (0, 0), 14 * mm),
                               ('TOPPADDING', (0, 0), (-1, -1), 1), ('BOTTOMPADDING', (0, 1), (-1, -1), 1)]))
     T = Table([[tel, imza]], colWidths=[G - 64 * mm, 64 * mm]); T.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'BOTTOM'), ('LEFTPADDING', (0, 0), (-1, -1), 0), ('RIGHTPADDING', (0, 0), (-1, -1), 0)]))
@@ -237,9 +237,8 @@ def ogrenci_belgesi(yol, okul, ayarlar, ogrenci, sinif, tarih, kisi=None):
                   Paragraph(f"{e(E.buyuk(ayarlar.get('belge_mudur') or ''))}<br/>OKUL MÜDÜRÜ", st(10, hiza=TA_CENTER, satir=14))]], colWidths=[G / 2, G / 2])
     akis.append(KeepTogether([imz]))
 
-    def alt(c, d):
-        c.saveState(); c.setFont(FONT, 7.5); c.setFillColor(GRI)
-        c.drawString(22 * mm, 9 * mm, f'{surum.AD} · {time.strftime("%d.%m.%Y %H:%M")}'); c.restoreState()
+    def alt(c, d):                                              # resmî belge: altında program adı yazmaz (Ertan 03.11.2026)
+        pass
     _kaydet(doc, akis, gecici, yol, alt)
     return yol
 

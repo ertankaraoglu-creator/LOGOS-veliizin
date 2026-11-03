@@ -27,6 +27,10 @@ ve LOGOS Disiplin'in (`../LOGOS DİSİPLİN/CLAUDE.md`) kuralları burada da ge�
 - Aynı "dil": Python + pywebview + tek `arayuz.html` (saf JS), PyInstaller + Inno Setup; LOGOS'un renkleri, kenar çubuğu, kartları.
   Ölçüt: 12 yaşındaki bir çocuğun birkaç dakikada çözebileceği, güven veren, modern arayüz.
 
+- Belgeler (Ertan 03.11.2026, 20:03): dilekçe **tek nüsha**; dilekçede yakınlık iyelik ekiyle ("öğrencinin annesi", "babası", `izin.yakinlik_metni`
+  ve arayüzde `yakinlikMetni`, ikisi aynı tabloyla); **öğrenci belgesinin numarası yok** ve altında program adı yazmaz; yarım gün e-Okul'a
+  **0,5** işlenir (istatistik de öyle sayar).
+
 ## Veri ve güvenlik
 - Öğrenci listesi, fotoğraflar, kimlik numaraları, veli bilgileri okulun hassas verisidir. **Veri okuldan çıkmaz**: program hiçbir sunucuya
   bir şey göndermez, internete kendiliğinden hiç çıkmaz (`surum.GUNCELLEME_ADRESI = None`; güncellemeler dersdagitim.com'dan elle).

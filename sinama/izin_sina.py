@@ -69,6 +69,15 @@ class MetinSina(unittest.TestCase):
         with self.assertRaises(IZ.Hata): IZ.metin_denetle('')
 
 
+class YakinlikSina(unittest.TestCase):
+    def test_iyelik(self):
+        """Ertan 03.11.2026: dilekçede "öğrencinin anne" değil "öğrencinin annesi"."""
+        for (y, a), beklenen in ((('Anne', ''), 'annesi'), (('Baba', ''), 'babası'), (('Vasi', ''), 'vasisi'), (('', ''), 'velisi'), (('Velisi', ''), 'velisi'),
+                                 (('Diğer', 'teyze'), 'teyzesi'), (('Diğer', 'Ablası'), 'ablası'), (('Diğer', 'DAYI'), 'dayısı'), (('Diğer', ''), 'yakını'),
+                                 (('Diğer', 'komşusu'), 'komşusu'), (('teyzesi', ''), 'teyzesi'), (('Diğer', 'üvey  anne'), 'üvey annesi')):
+            self.assertEqual(IZ.yakinlik_metni(y, a), beklenen, (y, a))
+
+
 class DuzeltSina(unittest.TestCase):
     def test_duzelt(self):
         d = IZ.duzelt(izin(veli={'ad': ' Ayşe  Kaya ', 'yakinlik': 'Diğer', 'yakinlik_aciklama': 'teyzesi', 'tel': '5321234567', 'tc': '10000000146'},
