@@ -42,18 +42,29 @@ jobs:
         run: python -W ignore -m unittest sinama.kasa_sina sinama.eokul_sina sinama.izin_sina sinama.api_sina
       - name: Derle ve sına
         run: python paket/derle.py
-      - name: Kurulum paketini sına (sessiz kur, aç, kaldır)
+      # Kurulum klasörü "LOGOS Veli İzin" (Türkçe İ): yol betikte yazılmaz, kurulumun kaldırma kaydından okunur (betik kodlamasına takılmasın)
+      - name: Kurulum paketini sına - sessiz kur
         shell: pwsh
         run: |
-          $k = "dist\dagitim\LOGOS-Veli-Izin-kurulum.exe"
-          Start-Process $k -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/TASKS=masaustu' -Wait
-          $exe = "$env:LOCALAPPDATA\Programs\LOGOS Veli İzin\LOGOS-Veli-Izin.exe"
-          if (-not (Test-Path $exe)) { throw "kurulmadı: $exe" }
-          python paket/duman.py "$exe"
-          $u = "$env:LOCALAPPDATA\Programs\LOGOS Veli İzin\unins000.exe"
-          Start-Process $u -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait
+          Start-Process "dist\dagitim\LOGOS-Veli-Izin-kurulum.exe" -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/TASKS=masaustu' -Wait
+          $kayit = Get-ChildItem 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall' | Get-ItemProperty | Where-Object { $_.DisplayName -like 'LOGOS Veli*' }
+          if (-not $kayit) { "::error title=Kurulum::Uygulamalar listesinde kayıt yok"; exit 1 }
+          $klasor = $kayit.InstallLocation.TrimEnd('\')
+          $exe = Join-Path $klasor 'LOGOS-Veli-Izin.exe'
+          if (-not (Test-Path -LiteralPath $exe)) { "::error title=Kurulum::kurulmadı: $exe"; Get-ChildItem -LiteralPath $klasor -ErrorAction SilentlyContinue; exit 1 }
+          "KURULU_EXE=$exe" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "KURULU_KALDIR=$(Join-Path $klasor 'unins000.exe')" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "kuruldu: $exe"
+      - name: Kurulum paketini sına - kurulan uygulamayı aç
+        shell: pwsh
+        run: python paket/duman.py $env:KURULU_EXE
+      - name: Kurulum paketini sına - kaldır
+        shell: pwsh
+        run: |
+          Get-Process | Where-Object { $_.Path -like '*LOGOS-Veli-Izin*' } | ForEach-Object { "kapanmamış süreç: $($_.Id) $($_.Path)"; Stop-Process -Id $_.Id -Force }
+          Start-Process $env:KURULU_KALDIR -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait
           Start-Sleep -Seconds 3
-          if (Test-Path $exe) { throw "kaldırılmadı: $exe" }
+          if (Test-Path -LiteralPath $env:KURULU_EXE) { "::error title=Kaldırma::kaldırılmadı: $env:KURULU_EXE"; exit 1 }
           "kurulum sınaması: TAMAM"
       - uses: actions/upload-artifact@v4
         with:

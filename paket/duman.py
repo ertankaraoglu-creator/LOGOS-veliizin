@@ -39,7 +39,7 @@ class Paket:
         raise SystemExit('paket 120 sn içinde açılmadı; günlük: ' + self.gunluk())
 
     def __exit__(self, *a):
-        if self.p and self.p.poll() is None: self.p.kill(); self.p.wait(10)
+        kapat(self.p)
 
     def gunluk(self):
         try:
@@ -52,8 +52,20 @@ class Paket:
         with urllib.request.urlopen(r, timeout=120) as y: return json.loads(y.read())
 
 
+def kapat(p):
+    """Paketi bütünüyle kapatır. Windows'ta tek dosyalı exe bir alt süreç açar: yalnız üsttekini öldürmek alttakini (exe'yi tutan) bırakır,
+    kaldırıcı dosyayı silemez (03.11.2026 GitHub derlemesi). Süreç ağacı taskkill /T ile kapanır."""
+    if not p or p.poll() is not None: return
+    if sys.platform == 'win32': subprocess.run(['taskkill', '/F', '/T', '/PID', str(p.pid)], capture_output=True)
+    else: p.kill()
+    try: p.wait(15)
+    except subprocess.TimeoutExpired: pass
+
+
 def iyi(kosul, ne):
-    if not kosul: raise SystemExit('DUMAN BAŞARISIZ: ' + ne)
+    if not kosul:
+        if os.environ.get('GITHUB_ACTIONS'): print(f'::error title=Duman sınaması::{ne}', flush=True)
+        raise SystemExit('DUMAN BAŞARISIZ: ' + ne)
     print('  tamam:', ne, flush=True)
 
 
@@ -128,13 +140,13 @@ def pencere_sinamasi(exe):
         son = time.time() + 150
         while not os.path.exists(isaret):
             if p.poll() is not None: raise SystemExit(f'DUMAN BAŞARISIZ: pencere açılmadan çıktı ({p.returncode})')
-            if time.time() > son: p.kill(); raise SystemExit('DUMAN BAŞARISIZ: arayüz 150 sn içinde Python\'a bağlanmadı (WebView2?)')
+            if time.time() > son: kapat(p); raise SystemExit('DUMAN BAŞARISIZ: arayüz 150 sn içinde Python\'a bağlanmadı (WebView2?)')
             time.sleep(.5)
         iyi(True, 'pencere açıldı, arayüz Python\'a bağlandı')
         t = time.time(); ikinci = subprocess.run([exe], env=ortam(k), timeout=60)
         iyi(ikinci.returncode == 0 and time.time() - t < 40 and p.poll() is None, 'ikinci açılış birinciyi öne getirip çıktı')
         try: p.wait(60)
-        except subprocess.TimeoutExpired: p.kill(); raise SystemExit('DUMAN BAŞARISIZ: pencere kapanmadı')
+        except subprocess.TimeoutExpired: kapat(p); raise SystemExit('DUMAN BAŞARISIZ: pencere kapanmadı')
         iyi(p.returncode == 0, 'pencere kapandı')
     finally:
         shutil.rmtree(k, ignore_errors=True)

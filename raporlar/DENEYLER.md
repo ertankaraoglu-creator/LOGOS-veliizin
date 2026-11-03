@@ -17,6 +17,13 @@ Tarih, komut, süre, sonuç, öğrenilen. Gerçek veriyle yapılanlar yalnız sa
 - Sonuç: `eokul.oku` üçünü de 'genel', kimlik listesini 'kimlik' tanıdı; bütün alanlar beklenenle aynı; boş bırakılan fotoğraf None.
 - Öğrenilen: gerçek düzeni taklit için çerçeve dikdörtgeni şart (`_bloklar` önce dikdörtgenlere bakıyor).
 
+## D5 - 03.11.2026 - İlk Windows derlemesi (GitHub, windows-latest)
+- Sonuç: derleme ve paketin duman sınaması (pencere dahil) geçti: `LOGOS-Veli-Izin.exe` 27,8 MB, kurulum 29,4 MB (ikisi de sohbete
+  gönderilebilir, sınır 30 MiB). "Kurulum paketini sına" adımı düştü; Actions günlüğü buluttan okunamıyor, yalnız "exit code 1".
+- Tahmin: duman sınaması paketi `kill()` ile kapatıyordu; Windows'ta tek dosyalı exe alt süreç açar, alttaki exe'yi tutar, kaldırıcı
+  silemez. Düzeltme: `taskkill /F /T` (süreç ağacı); adım üçe bölündü, her hata `::error` açıklaması olarak görünür; kurulum klasörü yolu
+  (Türkçe İ) betikte yazılmaz, kaldırma kaydından (`InstallLocation`) okunur.
+
 ## D4 - 03.11.2026 - Linux deneme paketi (bulut)
 - Komut: `python3 paket/derle.py --kurulum-yok` (PyInstaller 6, Python 3.13; ~1,5 dk).
 - Sonuç: `LOGOS-Veli-Izin-linux` 36,6 MB; duman sınamasının 29 denetimi geçti (fotoğraf kırpma pakette, logo PDF'te, kasada açık veri yok).
