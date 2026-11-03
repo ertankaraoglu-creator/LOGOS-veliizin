@@ -105,9 +105,39 @@ class DuzeltSina(unittest.TestCase):
         self.assertTrue(any('md. 36' in x for x in IZ.uyarilar(d, [])))
         d = IZ.duzelt(izin(gunler={'2026-10-28': 'tam'}, tarih='2026-11-04'))                 # bayram ve hafta sonu sayılmaz: 5 iş günü
         self.assertEqual(IZ.uyarilar(d, []), [])
-        d = IZ.duzelt(izin(devamsizlik={'ozurlu': '20', 'ozursuz': '10'}))
+        d = IZ.duzelt(izin(devamsizlik={'ozurlu': '20', 'ozursuz': '10'}, gunler={'2026-11-05': 'tam'}))      # ileriye dönük: e-Okul'da henüz yok
         u = IZ.uyarilar(d, [], {'ozursuz': 10, 'toplam': 30})
-        self.assertEqual(len(u), 2); self.assertIn('Özürsüz', u[0]); self.assertIn('31 güne', u[1])
+        self.assertEqual(len(u), 2); self.assertIn('Özürsüz', u[0]); self.assertIn('Bu izinle birlikte toplam devamsızlık 31 güne', u[1])
+        d = IZ.duzelt(izin(devamsizlik={'ozurlu': '20', 'ozursuz': '9'}))                                    # geriye dönük: gün zaten sayılı, iki kez eklenmez
+        self.assertEqual(IZ.uyarilar(d, [], {'ozursuz': 10, 'toplam': 30}), ['Toplam devamsızlık 29 gün; 30 gün sınırına 1 gün kaldı.'])
+
+
+class DevamsizlikSina(unittest.TestCase):
+    """Ertan 03.11.2026: dilekçe tarihi itibarıyla özürlü / özürsüz devamsızlık, "bir nevi devamsızlık mektubu gibi"."""
+    S = {'ozursuz': 10, 'toplam': 30}
+
+    def test_ozet(self):
+        self.assertIsNone(IZ.devamsizlik_ozeti(IZ.duzelt(izin()), self.S))                                   # girilmezse bölüm yok
+        d = IZ.duzelt(izin(tarih='2026-11-03', gunler={'2026-11-02': 'tam', '2026-11-03': 'sonra', '2026-11-04': 'tam'}, devamsizlik={'ozurlu': '4,5', 'ozursuz': '2'}))
+        o = IZ.devamsizlik_ozeti(d, self.S)
+        self.assertEqual((o['ozurlu'], o['ozursuz'], o['toplam'], o['eklenecek'], o['sonra_toplam'], o['kalan_ozursuz'], o['kalan_toplam']), (4.5, 2, 6.5, 1.5, 8, 8, 22))
+        m = IZ.devamsizlik_metni(o, d['tarih'])
+        self.assertEqual(m['baslik'], 'Devamsızlık durumu (3 Kasım 2026 tarihi itibarıyla)')
+        self.assertEqual(m['sutunlar'], [('Özürlü', '4,5 gün'), ('Özürsüz', '2 gün'), ('Toplam', '6,5 gün'), ('Bu izinle birlikte toplam', '8 gün')])
+        self.assertEqual(m['cumle'], 'Özürsüz devamsızlık sınırı 10 gün, toplam devamsızlık sınırı 30 gündür; bu izinle birlikte sınırlara kalan süre özürsüz 8 gün, toplam 22 gündür.')
+        self.assertIn('öğrendim', m['onay'])
+
+    def test_gecmis_ve_asim(self):
+        d = IZ.duzelt(izin(devamsizlik={'ozursuz': '11'}))                                                    # özürlü boş: 0
+        o = IZ.devamsizlik_ozeti(d, self.S); m = IZ.devamsizlik_metni(o, d['tarih'])
+        self.assertEqual(len(m['sutunlar']), 3); self.assertEqual(m['sutunlar'][0], ('Özürlü', '0 gün'))
+        self.assertIn('özürsüz devamsızlık sınırı 1 gün aşılmıştır', m['cumle']); self.assertIn('kalan süre toplam 19 gün', m['cumle'])
+        m = IZ.devamsizlik_metni(IZ.devamsizlik_ozeti(d, {}), d['tarih']); self.assertEqual(m['cumle'], '')          # sınır yoksa cümle yok
+
+    def test_denetim(self):
+        self.assertEqual(IZ.duzelt(izin(devamsizlik={'ozurlu': '0', 'ozursuz': ''}))['devamsizlik'], {'ozurlu': 0.0})
+        for v in ('-1', '400', '2,3', 'iki'):
+            with self.assertRaises(IZ.Hata, msg=v): IZ.duzelt(izin(devamsizlik={'ozurlu': v}))
 
 
 class OgrenciSina(unittest.TestCase):

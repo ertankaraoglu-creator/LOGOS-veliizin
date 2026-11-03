@@ -59,12 +59,13 @@ def csv_metni(yil_verisi, yil):
     """Kayıtların dökümü (Türkçe Excel: ';' ve UTF-8 BOM)."""
     L = [i for i in yil_verisi.get('izinler') or [] if not i.get('silindi')]
     O = {o['no']: o for o in yil_verisi.get('ogrenciler') or []}; S = yil_verisi.get('siniflar') or {}
-    satirlar = [['Kayıt no', 'Dilekçe tarihi', 'Okul no', 'Öğrenci', 'Sınıf', 'Dilekçeyi veren', 'Yakınlığı', 'Telefon', 'Neden', 'İzin günleri', 'Gün', 'Yön']]
+    satirlar = [['Kayıt no', 'Dilekçe tarihi', 'Okul no', 'Öğrenci', 'Sınıf', 'Dilekçeyi veren', 'Yakınlığı', 'Telefon', 'Neden', 'İzin günleri', 'Gün', 'Yön', 'Özürlü (dilekçe günü)', 'Özürsüz (dilekçe günü)']]
     for i in sorted(L, key=lambda x: x.get('no') or 0):
         o = O.get(i['ogrenci_no']) or i.get('ogrenci') or {}; v = i.get('veli') or {}
         yak = v.get('yakinlik') or ''; yak = yak + (f" ({v.get('yakinlik_aciklama')})" if v.get('yakinlik_aciklama') else '')
         satirlar.append([i.get('no'), IZ.tarih_kisa(i['tarih']), i['ogrenci_no'], o.get('ad', ''), (S.get(o.get('sinif')) or {}).get('kisa') or o.get('sinif', ''),
                          v.get('ad', ''), yak, v.get('tel', ''), i.get('neden', ''), IZ.gunler_listesi(i.get('gunler') or {}), IZ.sayi_metni(i.get('toplam') or 0),
-                         {'geriye': 'Özür beyanı', 'ileriye': 'İzin isteği'}.get(i.get('yon'), 'Karışık')])
+                         {'geriye': 'Özür beyanı', 'ileriye': 'İzin isteği'}.get(i.get('yon'), 'Karışık'),
+                         *((IZ.sayi_metni((i.get('devamsizlik') or {}).get(k) or 0) if i.get('devamsizlik') else '') for k in ('ozurlu', 'ozursuz'))])
     def h(c): return '"' + str(c if c is not None else '').replace('"', '""') + '"'
     return '﻿' + '\r\n'.join(';'.join(h(c) for c in r) for r in satirlar)

@@ -63,13 +63,15 @@ class ApiSina(unittest.TestCase):
         g1, g2 = okul_gunleri(2); bugun = self.ana.isgunu.bugun().isoformat()
         izin = {'ogrenci_no': 902, 'tarih': bugun, 'veli': {'ad': 'EMİNE YILDIRIM', 'yakinlik': 'Anne', 'kayitli': True}, 'gunler': {g1: 'tam', g2: 'sonra'},
                 'neden_kodu': 'cenaze', 'neden': 'yakınının vefatı', 'devamsizlik': {'ozurlu': '3', 'ozursuz': '1'}}
-        p = A.izin_onizle(izin); self.assertEqual(p['toplam'], 1.5); self.assertIn('yakınının vefatı nedeniyle', p['metin']); self.assertEqual(p['uyarilar'], [])
+        p = A.izin_onizle(izin); self.assertEqual(p['devamsizlik']['ozet']['toplam'], 4); self.assertIsNone(A.izin_onizle(dict(izin, devamsizlik=None))['devamsizlik'])
+        self.assertEqual(p['toplam'], 1.5); self.assertIn('yakınının vefatı nedeniyle', p['metin']); self.assertEqual(p['uyarilar'], [])
         self.assertEqual(p['antet'][-1], 'Çınar Mesleki ve Teknik Anadolu Lisesi Müdürlüğüne')
         self.assertEqual(A.izin_onizle(dict(izin, veli={'ad': 'X'}))['alan'], 'veli_ad')
         r = A.izin_kaydet(izin, yazdir=False)
         self.assertTrue(r['no_metni'].endswith('/0001'), r); self.assertTrue(os.path.exists(r['pdf'])); id1 = r['id']
         m = pdf_metni(r['pdf'])
-        for s in ('KONAK KAYMAKAMLIĞI', 'ÇİĞDEM DEMİR', '902', 'EMİNE YILDIRIM', 'yakınının vefatı', '1,5 (bir buçuk) gün', '36. maddesi', 'Okul idaresi', 'Kayıt no', '3 gün özürlü, 1 gün özürsüz'):
+        for s in ('KONAK KAYMAKAMLIĞI', 'ÇİĞDEM DEMİR', '902', 'EMİNE YILDIRIM', 'yakınının vefatı', '1,5 (bir buçuk) gün', '36. maddesi', 'Okul idaresi', 'Kayıt no', 'Devamsızlık durumu (', 'tarihi itibarıyla', 'Özürlü Özürsüz Toplam', '3 gün 1 gün 4 gün',
+                  'sınırlara kalan süre', 'devamsızlık durumunu öğrendim'):
             self.assertIn(s, m, s)
         self.assertNotIn('None', m)
         self.assertIn('LOGOS Veli İzin', m); self.assertIn('Kayıt no', m); self.assertTrue(A.ozet()['ayarlar']['kayit_no_goster'])     # Ertan 20:08: ikisi de kalır, kayıt no varsayılan açık
@@ -84,7 +86,19 @@ class ApiSina(unittest.TestCase):
         self.assertEqual(A.izin(id1)['izin']['neden'], 'hastaneye yatışı'); self.assertEqual(len(A.izinler()['izinler']), 2)
         self.assertEqual(len(A.izinler(sorgu='teyze')['izinler']), 1); self.assertEqual(len(A.izinler(sinif='9A-SH')['izinler']), 2); self.assertEqual(len(A.izinler(sinif='10B-HYH')['izinler']), 0)
         self.assertTrue(A.izin_yazdir(id2)['pdf']); self.assertTrue(A.izin_sil(id2)['ok']); self.assertIn('hata', A.izin(id2))
+        sd = A.ogrenci(902)['ogrenci']['son_devamsizlik']; self.assertEqual((sd['ozurlu'], sd['ozursuz']), (3, 1))                   # bir sonraki dilekçede öneri
         self.assertEqual(A.ogrenci(902)['ogrenci']['izin_sayisi'], 1); self.assertEqual(A.ozet()['sayilar']['izin'], 1)
+        # ---- okul logosu: dilekçenin sol üstüne basılır, Ayarlar'dan gizlenir
+        import base64, io, pdfplumber
+        from PIL import Image
+        b = io.BytesIO(); Image.new('RGBA', (300, 200), (200, 30, 30, 255)).save(b, 'PNG')
+        self.assertIn('hata', A.okul_logo_yukle('data:image/png;base64,QUJD'))
+        self.assertTrue(A.okul_logo_yukle('data:image/png;base64,' + base64.b64encode(b.getvalue()).decode())['ok']); self.assertTrue(A.ozet()['logo'])
+        self.assertTrue(A.okul_logo()['logo'].startswith('data:image/png;base64,'))
+        def resim_say(y):
+            with pdfplumber.open(y) as pp: return len(pp.pages[0].images)
+        self.assertEqual(resim_say(A.izin_yazdir(id1)['pdf']), 1)
+        A.ayar_kaydet({'logo_goster': False}); self.assertEqual(resim_say(A.izin_yazdir(id1)['pdf']), 0); A.ayar_kaydet({'logo_goster': True})
         # ---- öğrenci belgesi
         r = A.ogrenci_belgesi(1101, {}, yazdir=False); self.assertEqual(r['eksik'], ['tc'])                     # 11/C kimlik listesinde yok
         self.assertIn('hata', A.ogrenci_belgesi(1101, {'tc': '123', 'eksikleri_gordum': True}, yazdir=False))
@@ -102,7 +116,7 @@ class ApiSina(unittest.TestCase):
         self.assertEqual(i['en_cok'][0]['no'], 902); self.assertEqual(i['siniflar'][0], ['9A-SH', 1.5] if isinstance(i['siniflar'][0], list) else ('9A-SH', 1.5))
         c = A.istatistik_csv(); self.assertTrue(os.path.exists(c['dosya']))
         with open(c['dosya'], encoding='utf-8-sig') as f: csv = f.read()
-        self.assertIn('ÇİĞDEM DEMİR', csv); self.assertIn(';', csv)
+        self.assertIn('ÇİĞDEM DEMİR', csv); self.assertIn(';', csv); self.assertIn('Özürlü (dilekçe günü)', csv)
         # ---- ayarlar
         self.assertIn('hata', A.ayar_kaydet({'dilekce_metin': 'tarihsiz'})); self.assertIn('hata', A.ayar_kaydet({'kilit_dakika': 7}))
         self.assertEqual(A.ayar_kaydet({'onay_ad': 'Ertan K.', 'kilit_dakika': 0, 'kapali_gunler': [{'bas': g1, 'bit': g1, 'ad': 'Kar'}]})['ayarlar']['onay_ad'], 'Ertan K.')

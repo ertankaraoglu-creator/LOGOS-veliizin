@@ -213,15 +213,33 @@ def duzelt(izin):
 
 
 def _devamsizlik(d):
-    """İsteğe bağlı: dilekçeye yazılacak devamsızlık durumu {'ozurlu': 4.5, 'ozursuz': 2} ya da None."""
+    """İsteğe bağlı: dilekçe tarihi itibarıyla e-Okul'daki devamsızlık {'ozurlu': 4.5, 'ozursuz': 2} ya da None (Ertan 03.11.2026:
+    "dilekçenin yazıldığı gün itibarıyla özürlü ve özürsüz devamsızlık; bir nevi devamsızlık mektubu gibi"). Yarım gün 0,5."""
     if not isinstance(d, dict): return None
     out = {}
     for k in ('ozurlu', 'ozursuz'):
-        v = str(d.get(k) or '').replace(',', '.').strip()
+        v = str(d.get(k) if d.get(k) is not None else '').replace(',', '.').strip()
         if not v: continue
-        try: out[k] = round(float(v), 1)
+        try: n = float(v)
         except ValueError: raise Hata('Devamsızlık gün sayısı sayı olmalı (ör. 4,5).', 'devamsizlik')
+        if n < 0 or n > 365 or (n * 2) != int(n * 2): raise Hata('Devamsızlık gün sayısı 0 ile 365 arasında, tam ya da buçuklu olmalı (ör. 4,5).', 'devamsizlik')
+        out[k] = n
     return out or None
+
+
+def devamsizlik_ozeti(izin, sinirlar=None):
+    """Dilekçedeki devamsızlık bölümünün sayıları (belge, önizleme ve uyarılar aynı yerden). Girilmemişse None.
+    Girilen sayılar dilekçe tarihindeki e-Okul kaydıdır: geçmiş günler zaten içindedir (yoklama her gün girilir). Bu dilekçenin dilekçe
+    tarihi ve sonrasındaki günleri (ileriye dönük kısım) henüz yoktur: 'eklenecek' onlar; izin özürlü sayılır."""
+    d = izin.get('devamsizlik')
+    if not d: return None
+    s = sinirlar or {}
+    ozurlu, ozursuz = float(d.get('ozurlu') or 0), float(d.get('ozursuz') or 0)
+    eklenecek = sum(gun_degeri(t) for k, t in (izin.get('gunler') or {}).items() if k >= izin['tarih'])
+    toplam_ = ozurlu + ozursuz; sonra = toplam_ + eklenecek
+    so, st_ = s.get('ozursuz'), s.get('toplam')
+    return {'ozurlu': ozurlu, 'ozursuz': ozursuz, 'toplam': toplam_, 'eklenecek': eklenecek, 'sonra_ozurlu': ozurlu + eklenecek, 'sonra_toplam': sonra,
+            'sinir_ozursuz': so, 'sinir_toplam': st_, 'kalan_ozursuz': (so - ozursuz) if so else None, 'kalan_toplam': (st_ - sonra) if st_ else None}
 
 
 YAKINLIK_EKLI = {'anne': 'annesi', 'baba': 'babası', 'vasi': 'vasisi', 'veli': 'velisi', 'velisi': 'velisi', 'abla': 'ablası', 'abi': 'abisi',
@@ -238,6 +256,25 @@ def yakinlik_metni(yakinlik, aciklama=''):
     if y == 'Diğer': y = ' '.join(str(aciklama or '').split()) or 'yakını'
     k = E.kucuk(y) or 'velisi'
     return YAKINLIK_EKLI.get(k, k)
+
+
+def devamsizlik_metni(o, tarih):
+    """Dilekçedeki devamsızlık bölümünün yazıları; belge (belge.py) ve önizleme (arayüz) aynısını basar. o: devamsizlik_ozeti."""
+    def g(n): return f'{sayi_metni(n)} gün'
+    sutun = [('Özürlü', g(o['ozurlu'])), ('Özürsüz', g(o['ozursuz'])), ('Toplam', g(o['toplam']))]
+    if o['eklenecek']: sutun.append(('Bu izinle birlikte toplam', g(o['sonra_toplam'])))
+    sinir = [f"{ad} devamsızlık sınırı {sayi_metni(n)} gün" for ad, n in (('özürsüz', o['sinir_ozursuz']), ('toplam', o['sinir_toplam'])) if n]
+    cumle = ''
+    if sinir:
+        cumle = ', '.join(sinir) + 'dür'
+        kalan = [(ad, n) for ad, n in (('özürsüz', o['kalan_ozursuz']), ('toplam', o['kalan_toplam'])) if n is not None]
+        yeter = [f'{ad} {g(n)}' for ad, n in kalan if n >= 0]; asan = [f'{ad} devamsızlık sınırı {g(-n)} aşılmıştır' for ad, n in kalan if n < 0]
+        ek = 'bu izinle birlikte ' if o['eklenecek'] else ''
+        if yeter: cumle += f"; {ek}sınırlara kalan süre {', '.join(yeter)}dür"; ek = ''
+        if asan: cumle += f"; {ek}{', '.join(asan)}"
+        cumle = cumle[0].upper() + cumle[1:] + '.'
+    return {'baslik': f'Devamsızlık durumu ({tarih_uzun(tarih)} tarihi itibarıyla)', 'sutunlar': sutun, 'cumle': cumle,
+            'onay': 'Velisi olarak öğrencimin yukarıdaki devamsızlık durumunu öğrendim.'}
 
 
 def tel_duzelt(t):
@@ -258,12 +295,11 @@ def uyarilar(izin, onceki, sinirlar=None):
     if ilk < t and is_gunu_farki(ilk, t) > BEYAN_IS_GUNU:
         U.append(f'{tarih_uzun(ilk)} üzerinden {BEYAN_IS_GUNU} iş gününden çok geçmiş. Yönetmeliğe göre veli beyanı, özür gününü izleyen '
                  f'{BEYAN_IS_GUNU} iş günü içinde verilir (md. 36).')
-    d = izin.get('devamsizlik'); s = sinirlar or {}
-    if d:
-        ozurlu, ozursuz, tpl = d.get('ozurlu', 0), d.get('ozursuz', 0), izin['toplam']
-        if s.get('ozursuz') and ozursuz >= s['ozursuz']: U.append(f"Özürsüz devamsızlık {sayi_metni(ozursuz)} gün, sınır {s['ozursuz']} gün.")
+    o = devamsizlik_ozeti(izin, sinirlar); s = sinirlar or {}
+    if o:
+        if s.get('ozursuz') and o['ozursuz'] >= s['ozursuz']: U.append(f"Özürsüz devamsızlık {sayi_metni(o['ozursuz'])} gün, sınır {s['ozursuz']} gün.")
         if s.get('toplam'):
-            hepsi = ozurlu + ozursuz + tpl
-            if hepsi > s['toplam']: U.append(f"Bu izinle birlikte toplam devamsızlık {sayi_metni(hepsi)} güne çıkıyor, sınır {s['toplam']} gün.")
-            elif hepsi >= s['toplam'] - 5: U.append(f"Bu izinle birlikte toplam {sayi_metni(hepsi)} gün; {s['toplam']} gün sınırına {sayi_metni(s['toplam'] - hepsi)} gün kaldı.")
+            hepsi = o['sonra_toplam']; ne = 'Bu izinle birlikte toplam devamsızlık' if o['eklenecek'] else 'Toplam devamsızlık'
+            if hepsi > s['toplam']: U.append(f"{ne} {sayi_metni(hepsi)} güne çıkıyor, sınır {s['toplam']} gün.")
+            elif hepsi >= s['toplam'] - 5: U.append(f"{ne} {sayi_metni(hepsi)} gün; {s['toplam']} gün sınırına {sayi_metni(s['toplam'] - hepsi)} gün kaldı.")
     return U

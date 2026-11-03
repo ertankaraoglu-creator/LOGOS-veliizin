@@ -36,8 +36,8 @@ Aynı dil: Python + pywebview + tek HTML, LOGOS teması. Veri yalnız idarecinin
 `raporlar/SURUM_1_0.md` "Sıra": okulda deneme → paketleme → öğrenci belgesi düzeni → ince ayar.
 
 ## Git
-İlk commit bu oturumda, Ertan'ın Mac'indeki `LOGOS Veli İzin` klasöründe. GitHub deposu henüz açılmadı: Ertan açınca `git remote add origin`
-ve push (hatırlatıldı).
+İlk commit bu oturumda, Ertan'ın Mac'indeki `LOGOS Veli İzin` klasöründe. GitHub deposu 20:22'de açıldı (`ertankaraoglu-creator/LOGOS-veliizin`,
+gizli): üç commit buluttan push edildi (Mac'teki commit'ler git paketiyle taşındı, kimlikler aynı), Mac'teki klasörün `origin`'i bu depo.
 
 ## Ek (20:03) - Ertan'ın ilk geri bildirimi
 - Öğrenci belgesinin numarası yok; altındaki "LOGOS Veli İzin" kaldırıldı.
@@ -46,3 +46,12 @@ ve push (hatırlatıldı).
   Elle girilmiş velinin yakınlığı ("teyzesi") seçim kutusunda Diğer + açıklama olarak açılıyor (önceden kutu boş kalıyordu).
 - Sınamalar: `izin_sina.YakinlikSina`, `api_sina` (PDF'te "annesi", öğrenci belgesinde "LOGOS" yok), `ui_duman` (önizlemede "annesi"). Hepsi geçiyor.
 - Soruldu: dilekçenin sağ altındaki program adı ve saat de kalksın mı? Cevap (20:08): kalsın; kayıt numarası da varsayılan açık, Ayarlar'dan kapatılabilir. Sınamaya eklendi.
+
+## Ek (20:27-20:32) - okul logosu ve devamsızlık durumu
+- İkisi de iskelette vardı (eski HTML'deki gibi); Ertan uygulamayı henüz açmadığı için görmemişti. Geliştirildi:
+  - Devamsızlık: tablodaki tek satır yerine ayrı bölüm (Ertan: "bir nevi devamsızlık mektubu gibi"); idareci e-Okul'dan bakıp elle yazar
+    (Ertan: "mantık bu"). Bu izinle birlikte toplam, sınırlar, kalan süre, "öğrendim" cümlesi (Claude'un önerisi; Ertan'a soruldu).
+    Uyarılardaki çift sayım düzeltildi: geriye dönük günler e-Okul'da zaten var, yalnız dilekçe günü ve sonrası eklenir.
+  - Logo: Ayarlar'da önizleme; arayüz logoyu her önizlemede yeniden istemiyor.
+- Sınamalar: `izin_sina.DevamsizlikSina` (3), `api_sina` (bölümün PDF'teki yazıları, son devamsızlık önerisi, logo PDF'te resim ve gizleme,
+  CSV sütunları), `ui_duman` (logo yükleme ve önizlemede görünmesi, devamsızlık bölümü, "Bunu yaz"). Hepsi geçiyor.

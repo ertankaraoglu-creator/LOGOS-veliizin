@@ -69,6 +69,15 @@ def main(ekran_klasoru=None):
         sayfa.click('#modal button:text-is("Döndür")'); sayfa.wait_for_function("document.getElementById('opFoto').style.transform.includes('90')")
         sayfa.fill('#opNot', 'Servisle gelir'); sayfa.click('#modal button:text-is("Kaydet")'); sayfa.wait_for_selector('#modal', state='hidden')
 
+        # ---- okul logosu (Ayarlar › Okul): dosya seçilir, önizlemesi çıkar; dilekçenin sol üstünde görünür
+        from PIL import Image
+        logo = os.path.join(S.klasor, 'logo.png'); Image.new('RGBA', (240, 240), (20, 60, 160, 255)).save(logo)
+        sayfa.click('aside button[data-sayfa=ayarlar]'); sayfa.wait_for_selector('#aLogoYukle')
+        with sayfa.expect_file_chooser() as fc: sayfa.click('#aLogoYukle')
+        fc.value.set_files(logo)
+        sayfa.wait_for_selector('.toast:has-text("Logo kaydedildi")')
+        sayfa.wait_for_function("document.getElementById('aLogo') && document.getElementById('aLogo').src.startsWith('data:image/png')")
+        ekran.al(sayfa, 'ayarlar-logo')
         # ---- dilekçe: ara (Türkçe harfsiz), seç
         sayfa.click('aside button[data-sayfa=dilekce]')
         sayfa.fill('#q', 'cigdem'); sayfa.wait_for_selector('#sonuclar .snc')
@@ -93,6 +102,14 @@ def main(ekran_klasoru=None):
         sayfa.click('#nedenler >> text=Cenaze')
         sayfa.wait_for_function("document.querySelector('#kagit .kg-metin') && document.querySelector('#kagit .kg-metin').textContent.includes('vefat')")
         expect(sayfa.locator('#kagit')).to_contain_text('(öğrencinin annesi)'); expect(sayfa.locator('#kagit')).to_contain_text('Öğrencinin annesi')
+        sayfa.wait_for_function("document.getElementById('kgLogo') && document.getElementById('kgLogo').src.startsWith('data:image/png')")
+        # devamsızlık durumu (isteğe bağlı, dilekçe tarihi itibarıyla): devamsızlık mektubu gibi ayrı bölüm
+        expect(sayfa.locator('#kagit .kg-dev')).to_have_count(0)
+        sayfa.click('#devBox summary'); expect(sayfa.locator('#devAcik')).to_contain_text('itibarıyla')
+        sayfa.fill('#dOz', '4,5'); sayfa.fill('#dOzs', '2')
+        sayfa.wait_for_selector('#kagit .kg-dev'); expect(sayfa.locator('#kagit .kg-dev')).to_contain_text('tarihi itibarıyla')
+        expect(sayfa.locator('#kagit .kg-dev')).to_contain_text('6,5 gün'); expect(sayfa.locator('#kagit .kg-dev')).to_contain_text('öğrendim')
+        expect(sayfa.locator('#kagit .kg-dev')).to_contain_text('sınırlara kalan süre'); expect(sayfa.locator('#devOzet')).to_contain_text('Toplam')
         ekran.al(sayfa, 'dilekce-takvim')
         # kaydet (yazdırmadan)
         sayfa.click('.eylemler button:text-is("Kaydet")')
@@ -104,6 +121,9 @@ def main(ekran_klasoru=None):
         # ---- ikinci dilekçe: aynı öğrenci, aynı gün → uyarı penceresi; "Diğer" kişi; kaydet ve yazdır (tarayıcıda PDF açılmaz)
         sayfa.click('text=Yeni dilekçe'); sayfa.wait_for_selector('#dkSec:not([hidden])')
         sayfa.fill('#q', '902'); sayfa.wait_for_selector('#sonuclar .snc'); sayfa.keyboard.press('Enter'); sayfa.wait_for_selector('#dkKalan:not([hidden])')
+        sayfa.click('#devBox summary'); sayfa.wait_for_selector('#devSon button')                                  # son dilekçedeki devamsızlık önerilir
+        expect(sayfa.locator('#devSon')).to_contain_text('4,5 gün özürlü, 2 gün özürsüz'); sayfa.click('#devSon button')
+        expect(sayfa.locator('#dOz')).to_have_value('4,5'); expect(sayfa.locator('#dOzs')).to_have_value('2')
         sayfa.click('#veliCipler >> text=Diğer'); sayfa.fill('#vAd', 'Ayşe Kaya'); sayfa.fill('#vYakAc', 'teyzesi'); sayfa.fill('#vTel', '05321234567'); sayfa.fill('#vTc', '10000000146')
         takvime_git(sayfa, g2); sayfa.click(f'button.gun[data-d="{g2.isoformat()}"]'); sayfa.wait_for_selector('.donem')
         sayfa.wait_for_selector('#gunUyari .uyari-kutu')

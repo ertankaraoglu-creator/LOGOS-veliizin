@@ -155,9 +155,11 @@ class Api:
         """Arayüze giden öğrenci: fotoğraf dahil, yıl içindeki izin sayısı ve toplam günle."""
         Y = Y or self._Y(); s = self._sinif(o, Y)
         izinler = [i for i in Y['izinler'] if str(i['ogrenci_no']) == str(o['no']) and not i.get('silindi')]
+        son = max((i for i in izinler if i.get('devamsizlik')), key=lambda i: (i.get('tarih') or '', i.get('no') or 0), default=None)
         return dict(o, sinif_ad=s['sinif'], sinif_kisa=s['kisa'], alan=s['alan'], dal=o.get('dal') or s.get('dal') or '', ad_kisa=OG.ad_kisa(o),
                     izin_sayisi=len(izinler), izin_gun=sum(float(i.get('toplam') or 0) for i in izinler), yas=OG.yas(o),
-                    veli_adaylari=OG.veli_adaylari(o))
+                    veli_adaylari=OG.veli_adaylari(o),
+                    son_devamsizlik=dict(son['devamsizlik'], tarih=son['tarih'], id=son['id']) if son else None)
 
     # ------------------------------------------------------------ geliştiriciden kurtarma (gelistirici.py; Disiplin'deki gibi)
     @staticmethod
@@ -579,7 +581,13 @@ class Api:
                          'gunler_listesi': IZ.gunler_listesi(d['gunler']), 'gruplar': IZ.gruplar(d['gunler']), 'toplam': d['toplam'],
                          'uyarilar': IZ.uyarilar(d, onceki, {'ozursuz': a.get('sinir_ozursuz'), 'toplam': a.get('sinir_toplam')}),
                          'yon': d['yon'], 'antet': BL.antet(self._okul(), hitap=True), 'konu': a.get('dilekce_konu') or IZ.VARSAYILAN_KONU,
-                         'tarih_uzun': IZ.tarih_uzun(d['tarih']), 'ogrenci': self._ogr_paket(o, Y) | {'foto': None}}
+                         'tarih_uzun': IZ.tarih_uzun(d['tarih']), 'ogrenci': self._ogr_paket(o, Y) | {'foto': None},
+                         'devamsizlik': self._devamsizlik_paket(d, a)}
+
+    @staticmethod
+    def _devamsizlik_paket(d, a):
+        o = IZ.devamsizlik_ozeti(d, {'ozursuz': a.get('sinir_ozursuz'), 'toplam': a.get('sinir_toplam')})
+        return dict(IZ.devamsizlik_metni(o, d['tarih']), ozet=o) if o else None
 
     @disari
     def izin_onizle(self, izin):

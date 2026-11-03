@@ -142,9 +142,6 @@ def dilekce(yol, okul, ayarlar, kayit, ogrenci, sinif, logo=None):
                 [('k', 'Sınıfı'), ('v', sinif.get('sinif', '')), ('k', 'Alanı'), ('v', E.baslik_harf(alan_dal) if alan_dal else '-')],
                 [('k', 'Baba adı'), ('v', ogrenci.get('baba') or '-'), ('k', 'Anne adı'), ('v', ogrenci.get('anne') or '-')],
                 [('k', 'İzin günleri'), ('v3', IZ.gunler_listesi(kayit['gunler']) + (f". Toplam <b>{IZ.gun_sayisi_metni(kayit['toplam'])}</b>" if len(IZ.gruplar(kayit['gunler'])) > 1 else ''))]]
-    d = kayit.get('devamsizlik')
-    if d:
-        satirlar.append([('k', 'Devamsızlık durumu'), ('v3', f"Bugüne kadar {IZ.sayi_metni(d.get('ozurlu', 0))} gün özürlü, {IZ.sayi_metni(d.get('ozursuz', 0))} gün özürsüz devamsızlığı vardır.")])
     veren = f"{e(v['ad'])} (öğrencinin {e(yak)})"
     if v.get('tc'): veren += f", T.C. kimlik no {e(v['tc'])}"
     if v.get('tel'): veren += f", tel. {e(v['tel'])}"
@@ -162,7 +159,10 @@ def dilekce(yol, okul, ayarlar, kayit, ogrenci, sinif, logo=None):
         while len(row) < 4: row.append('')
         H.append(row)
     T = Table(H, colWidths=[G * .27, G * .33, G * .17, G * .23]); T.setStyle(TableStyle(sty))
-    akis += [T, Spacer(1, 12 * mm)]
+    akis.append(T)
+    o = IZ.devamsizlik_ozeti(kayit, {'ozursuz': ayarlar.get('sinir_ozursuz'), 'toplam': ayarlar.get('sinir_toplam')})
+    if o: akis += [Spacer(1, 5 * mm), _devamsizlik_bolumu(IZ.devamsizlik_metni(o, kayit['tarih']), G)]
+    akis.append(Spacer(1, 9 * mm if o else 12 * mm))
     # imza
     tel = Paragraph(f"Telefon: {e(v['tel'])}" if v.get('tel') else '', st(11))
     imza = Table([[Paragraph('İmza', st(9, renk=GRI))], [Paragraph(f"<b>{e(v['ad'])}</b>", st(11.5, hiza=TA_CENTER))],
@@ -187,6 +187,22 @@ def dilekce(yol, okul, ayarlar, kayit, ogrenci, sinif, logo=None):
         c.drawRightString(A4[0] - 20 * mm, 9 * mm, f'{surum.AD} · {time.strftime("%d.%m.%Y %H:%M")}'); c.restoreState()
     _kaydet(doc, akis, gecici, yol, alt)
     return yol
+
+
+def _devamsizlik_bolumu(m, G):
+    """Dilekçenin devamsızlık bölümü (devamsızlık mektubu gibi): başlık, sayılar, sınırlar, velinin öğrendim cümlesi. Tek parça."""
+    S = m['sutunlar']; n = len(S)
+    H = [[Paragraph(e(m['baslik']), st(11, True, satir=14))] + [''] * (n - 1),
+         [Paragraph(e(a), st(10, True, TA_CENTER, satir=13)) for a, _ in S],
+         [Paragraph(e(v), st(11.5, True, TA_CENTER, satir=14)) for _, v in S]]
+    alt = (e(m['cumle']) + '<br/>' if m['cumle'] else '') + e(m['onay'])
+    H.append([Paragraph(alt, st(10.5, satir=14))] + [''] * (n - 1))
+    T = Table(H, colWidths=[G / n] * n)
+    T.setStyle(TableStyle([('GRID', (0, 0), (-1, -1), 0.6, colors.HexColor('#555555')), ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                           ('SPAN', (0, 0), (-1, 0)), ('SPAN', (0, 3), (-1, 3)), ('BACKGROUND', (0, 0), (-1, 1), ACIK),
+                           ('LEFTPADDING', (0, 0), (-1, -1), 2.6 * mm), ('RIGHTPADDING', (0, 0), (-1, -1), 2.6 * mm),
+                           ('TOPPADDING', (0, 0), (-1, -1), 1.6 * mm), ('BOTTOMPADDING', (0, 0), (-1, -1), 1.6 * mm)]))
+    return KeepTogether([T])
 
 
 def _logo(logo, ayarlar):

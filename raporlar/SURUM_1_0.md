@@ -9,6 +9,11 @@ Kapsam Ertan'ın (03.11.2026), sıra Claude'un; gerekçeler "Sıra" bölümünde
   kayıt no, PDF, yazdırma; Kayıtlar; öğrenci belgesi (e-Okul düzeni, eksik alanlar); İstatistik ve CSV; Ayarlar; yeni yıl; kilit.
 - Sınamalar: kasa, e-Okul, izin, Api, arayüz dumanı.
 
+## 0.1.1 (03.11.2026 akşam) - bitti
+- Devamsızlık durumu dilekçede ayrı bölüm ("devamsızlık mektubu gibi"): dilekçe tarihi itibarıyla, bu izinle birlikte toplam, sınırlar ve kalan
+  süre, velinin "öğrendim" cümlesi; son dilekçedeki sayılar önerilir.
+- Okul logosu Ayarlar'da önizlemeli; dilekçenin sol üstünde.
+
 ## Sıra
 1. **Okulda deneme (Ertan)**: gerçek PDF'lerle aktarma, bir günün dilekçeleri, yazıcıya doğrudan gönderme (Windows'ta `startfile(... 'print')`
    okulun PDF okuyucusuna bağlı; olmazsa "önce PDF açılsın" ayarı). Bulguları `raporlar/DENEYLER.md`'ye.

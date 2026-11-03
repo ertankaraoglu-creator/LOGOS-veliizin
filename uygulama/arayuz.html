@@ -182,6 +182,12 @@
   .kg-onay { margin-top:12mm; border:.7pt solid #555; padding:3.5mm 4mm; font-size:10.5pt; display:flex; justify-content:space-between; gap:8mm } .kg-onay .who { text-align:center; min-width:58mm } .kg-onay .who .sp { height:13mm }
   .kg-alt { margin-top:auto; font-size:7.5pt; color:#666; display:flex; justify-content:space-between } .kg-bos { margin:auto; text-align:center; color:#6b7280; font-family:inherit; font-size:11pt; max-width:95mm; line-height:1.5 }
   .ph { color:#999 }
+  .kg-dev { width:100%; border-collapse:collapse; margin-top:5mm; font-size:11pt; line-height:1.35 } .kg-dev td { border:.6pt solid #555; padding:1.6mm 2.6mm; text-align:center }
+  .kg-dev .bas td { background:#f1f1f1; font-weight:bold; text-align:left } .kg-dev .ad td { background:#f1f1f1; font-weight:bold; font-size:10pt } .kg-dev .say td { font-weight:bold; font-size:11.5pt }
+  .kg-dev .not td { text-align:left; font-size:10.5pt }
+  .dev-acik { margin:2px 0 0; font-size:12.5px; color:var(--ink2) } .dev-son { display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:12.5px; color:var(--mute); margin:-2px 0 6px }
+  .dev-ozet { font-size:12.5px; color:var(--ink2); background:#f1f5f9; border-radius:9px; padding:7px 10px }
+  .logo-onizleme { width:64px; height:64px; object-fit:contain; border:1px solid var(--line); border-radius:10px; background:#fff; padding:4px }
   /* öğrenci penceresi */
   .ogr-pencere { display:grid; grid-template-columns:150px 1fr; gap:16px } .ogr-pencere .foto { width:150px; height:190px; border-radius:10px; object-fit:cover; background:#eef2f7; border:1px solid #cbd5e1; display:block }
   .ogr-pencere .foto-eylem { display:flex; flex-direction:column; gap:6px; margin-top:8px }
@@ -347,13 +353,16 @@
               <div class="cipler" id="nedenler"></div>
               <label class="alan" style="margin-top:10px"><span>Dilekçede geçecek ifade <small>("… nedeniyle" diye devam eder)</small></span><textarea id="neden" rows="2" oninput="F.neden = this.value; kirli(); onizle()"></textarea></label>
               <details class="ek" id="devBox">
-                <summary>Devamsızlık durumu <small>isteğe bağlı, dilekçeye eklenir</small></summary>
+                <summary>Devamsızlık durumu <small>isteğe bağlı; dilekçe tarihi itibarıyla, devamsızlık mektubu gibi dilekçeye eklenir</small></summary>
+                <p class="dev-acik" id="devAcik"></p>
                 <div class="iki" style="margin-top:8px">
                   <label class="alan"><span>Özürlü gün</span><input type="text" id="dOz" inputmode="decimal" placeholder="örn. 4,5" oninput="F.devamsizlik.ozurlu = this.value; kirli(); onizle()"></label>
                   <label class="alan"><span>Özürsüz gün</span><input type="text" id="dOzs" inputmode="decimal" placeholder="örn. 2" oninput="F.devamsizlik.ozursuz = this.value; kirli(); onizle()"></label>
                 </div>
+                <div id="devSon"></div>
+                <div id="devOzet"></div>
               </details>
-              <label class="alan" style="margin-top:12px;max-width:220px"><span>Dilekçe tarihi</span><input type="date" id="dTarih" onchange="F.tarih = this.value; kirli(); onizle()"></label>
+              <label class="alan" style="margin-top:12px;max-width:220px"><span>Dilekçe tarihi</span><input type="date" id="dTarih" onchange="F.tarih = this.value; kirli(); devamsizlikCiz(); onizle()"></label>
             </div>
             <div class="eylemler">
               <div class="ozet" id="dkOzet"></div>
@@ -487,7 +496,8 @@ const tarihUzun = s => { const d = pd(s); return `${d.getDate()} ${AYLAR[d.getMo
 const pd = s => { const [y, m, d] = String(s).slice(0, 10).split('-').map(Number); return new Date(y, m - 1, d); };
 const iso = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 const addD = (s, n) => { const d = pd(s); d.setDate(d.getDate() + n); return iso(d); };
-let BAS = {}, OZ = {}, KIRLI = false;
+let BAS = {}, OZ = {}, KIRLI = false, LOGO_VERI = null;
+async function logoAl(){ if (LOGO_VERI === null){ const r = await api.cagir('okul_logo'); LOGO_VERI = r.logo || ''; } return LOGO_VERI; }
 let MESGUL = new Set();
 async function birKez(ad, fn){ if (MESGUL.has(ad)) return; MESGUL.add(ad); try { return await fn(); } finally { MESGUL.delete(ad); } }
 function kirli(v){ KIRLI = v !== false; api.cagir('kirli', KIRLI); }
@@ -546,7 +556,7 @@ async function kKasaKur(){
 }
 async function kurulumBitti(){ $('kurulum').hidden = true; $('yazdir').innerHTML = ''; await uygulamaAc(); sayfa('ogrenciler'); }
 function kilitEkrani(oto){
-  $('kenar').hidden = true; $('ana').hidden = true; modalKapat(); $('toasts').innerHTML = '';
+  $('kenar').hidden = true; $('ana').hidden = true; modalKapat(); $('toasts').innerHTML = ''; LOGO_VERI = null;
   $('kilit').hidden = false; $('kltAna').hidden = false; $('kltKurtarma').hidden = true; $('kltGel').hidden = true;
   $('kltDosya').textContent = BAS.kasa_yolu || ''; $('kltOto').hidden = !oto; $('kltSifre').value = ''; ileti('kltIleti', '');
   if (BAS.kasa_hata) ileti('kltIleti', BAS.kasa_hata, 'err');
@@ -623,11 +633,20 @@ function formuCiz(){
     <div class="eylem"><button class="btn kucuk" onclick="ogrenciDegistir()">Değiştir</button><button class="btn kucuk" onclick="ogrenciPencere('${esc(String(o.no))}')">Düzelt</button><button class="btn kucuk" onclick="ogrenciBelgesi('${esc(String(o.no))}')">Öğrenci belgesi</button></div></div>`;
   veliCiz(); nedenCiz();
   $('dOz').value = F.devamsizlik.ozurlu; $('dOzs').value = F.devamsizlik.ozursuz; $('dTarih').value = F.tarih;
-  if (F.devamsizlik.ozurlu || F.devamsizlik.ozursuz) $('devBox').open = true;
+  $('devBox').open = !!(String(F.devamsizlik.ozurlu || '').trim() || String(F.devamsizlik.ozursuz || '').trim());   // yeni dilekçede kapalı; girilmişse açık
+  devamsizlikCiz();
   document.querySelectorAll('#dkForm .hata').forEach(e => e.classList.remove('hata'));
   hizliCiz(); takvimCiz(); donemlerCiz();
   kagitCiz(ONZ && ONZ.ogrenci && String(ONZ.ogrenci.no) === String(o.no) ? ONZ : null); onizle();
 }
+function devamsizlikCiz(){
+  $('devAcik').textContent = `e-Okul'da ${tarihUzun(F.tarih)} itibarıyla kayıtlı özürlü ve özürsüz devamsızlığı yazın (yarım gün 0,5). Bu dilekçenin bugünden sonraki günleri "bu izinle birlikte" toplamına eklenir.`;
+  const sd = OGR && OGR.son_devamsizlik;
+  $('devSon').innerHTML = sd && sd.id !== F.id ? `<div class="dev-son">Son dilekçede (${esc(tarihUzun(sd.tarih))}): ${fmtNum(sd.ozurlu || 0)} gün özürlü, ${fmtNum(sd.ozursuz || 0)} gün özürsüz <button type="button" class="btn kucuk" onclick="devamsizlikKullan()">Bunu yaz</button></div>` : '';
+  const D = ONZ && ONZ.devamsizlik;
+  $('devOzet').innerHTML = D ? `<div class="dev-ozet">${D.sutunlar.map(([a, v]) => `${esc(a)} <b>${esc(v)}</b>`).join(' · ')}${D.ozet.kalan_toplam != null && D.ozet.kalan_toplam < 0 || D.ozet.kalan_ozursuz != null && D.ozet.kalan_ozursuz < 0 ? '<br><span style="color:var(--err-ink)">Sınır aşılmış.</span>' : ''}</div>` : '';
+}
+function devamsizlikKullan(){ const sd = OGR.son_devamsizlik; F.devamsizlik = {ozurlu: sd.ozurlu != null ? fmtNum(sd.ozurlu) : '', ozursuz: sd.ozursuz != null ? fmtNum(sd.ozursuz) : ''}; $('dOz').value = F.devamsizlik.ozurlu; $('dOzs').value = F.devamsizlik.ozursuz; kirli(); onizle(); }
 function veliCiz(){
   const adaylar = (OGR && OGR.veli_adaylari) || [];
   $('veliCipler').innerHTML = adaylar.map((a, i) => `<button type="button" class="cip ${F.veli.ad === a.ad ? 'on' : ''}" onclick="veliSec(${i})"><small>${esc(a.yakinlik)}${a.kayitli ? ' · kayıtlı' : ''}:</small> ${esc(a.ad)}</button>`).join('') +
@@ -734,7 +753,7 @@ async function onizleSimdi(){
   if (!OGR) return; const n = ++ONZ_SAYAC;
   const r = await api.cagir('izin_onizle', F); if (n !== ONZ_SAYAC) return;
   if (r.hata && !r.kilit){ ONZ = null; kagitCiz(null, r); ozetCiz(r); return; }
-  ONZ = r; kagitCiz(r); donemlerCiz(); ozetCiz(r);
+  ONZ = r; kagitCiz(r); donemlerCiz(); ozetCiz(r); devamsizlikCiz();
   $('gunUyari').innerHTML = (r.uyarilar || []).map(u => `<div class="uyari-kutu"><svg viewBox="0 0 24 24"><path d="M12 4 2.5 20h19zM12 10v4M12 17h.01"/></svg><span>${esc(u)}</span></div>`).join('');
 }
 function ozetCiz(r){
@@ -754,7 +773,7 @@ function kagitCiz(r, hata){
   if (r && r.metin){ metin = esc(r.metin); for (const p of [r.tarihler, r.toplam_metni]) if (p) metin = metin.replace(esc(p), `<b>${esc(p)}</b>`); }
   else metin = esc((A.dilekce_metin || '')).replace('{NEDEN}', F.neden.trim() ? esc(F.neden.trim()) : ph('……………')).replace('{TARIHLER}', ph('…………… tarihinde')).replace('{TOPLAM}', ph('…… gün')).replace('{OGRENCI}', esc(o.ad)).replace('{SINIF}', esc(o.sinif_ad)).replace('{NO}', esc(o.no));
   const gl = r && r.gunler_listesi ? esc(r.gunler_listesi) + (r.gruplar && r.gruplar.length > 1 ? `. Toplam <b>${r.toplam === .5 ? 'yarım gün' : fmtNum(r.toplam) + ' gün'}</b>` : '') : ph('Takvimden seçilecek');
-  const dz = F.devamsizlik; const d = dz.ozurlu || dz.ozursuz;
+  const dz = F.devamsizlik; const d = String(dz.ozurlu || '').trim() || String(dz.ozursuz || '').trim();
   const alan = o.alan ? baslikHarf(o.alan) + (o.dal ? ' / ' + baslikHarf(o.dal) : '') : '-';
   let veren = v.ad.trim() ? esc(v.ad.trim()) : ph('Veli adı soyadı'); veren += ` (öğrencinin ${esc(yak)})`; if (v.tc) veren += `, T.C. kimlik no ${esc(v.tc)}`; if (v.tel) veren += `, tel. ${esc(telBicim(v.tel))}`;
   h += `<p class="kg-konu"><b>Konu:</b> ${esc((r && r.konu) || A.dilekce_konu || '')}</p><p class="kg-metin">${metin}</p>
@@ -762,14 +781,21 @@ function kagitCiz(r, hata){
   <tr><td class="k">Sınıfı</td><td>${esc(o.sinif_ad)}</td><td class="k k2">Alanı</td><td>${esc(alan)}</td></tr>
   <tr><td class="k">Baba adı</td><td>${esc(o.baba || '-')}</td><td class="k k2">Anne adı</td><td>${esc(o.anne || '-')}</td></tr>
   <tr><td class="k">İzin günleri</td><td colspan="3">${gl}</td></tr>
-  ${d ? `<tr><td class="k">Devamsızlık durumu</td><td colspan="3">Bugüne kadar ${esc(dz.ozurlu || 0)} gün özürlü, ${esc(dz.ozursuz || 0)} gün özürsüz devamsızlığı vardır.</td></tr>` : ''}
-  <tr><td class="k">Dilekçeyi veren</td><td colspan="3">${veren}</td></tr></tbody></table>
+  <tr><td class="k">Dilekçeyi veren</td><td colspan="3">${veren}</td></tr></tbody></table>${devBolumu(r && r.devamsizlik, d ? dz : null)}
   <div class="kg-imza"><div>${v.tel ? 'Telefon: ' + esc(telBicim(v.tel)) : ''}</div><div class="sig"><div class="ln">İmza</div><div><b>${v.ad.trim() ? esc(v.ad.trim()) : ph('Veli adı soyadı')}</b></div><div>Öğrencinin ${esc(yak)}</div></div></div>`;
   if (A.onay_kutusu !== false) h += `<div class="kg-onay"><div><b>Okul idaresi</b><br>Öğrencinin yukarıda belirtilen günlerde izinli sayılması uygundur.<div style="margin-top:4mm">Tarih: ...... / ...... / 20......</div></div><div class="who"><div class="sp"></div><div>${esc(A.onay_ad) || '&nbsp;'}</div><div>${esc(A.onay_unvan || 'Müdür Yardımcısı')}</div></div></div>`;
   h += `<div class="kg-alt"><span>${A.kayit_no_goster !== false && F.no_metni ? 'Kayıt no: ' + esc(F.no_metni) : ''}</span><span>LOGOS Veli İzin</span></div>`;
   k.innerHTML = h;
-  if ($('kgLogo')) api.cagir('okul_logo').then(r => { if (r.logo && $('kgLogo')) $('kgLogo').src = r.logo; });
+  if ($('kgLogo')) logoAl().then(l => { if (l && $('kgLogo')) $('kgLogo').src = l; });
   kagitSigdir();
+}
+function devBolumu(D, yerel){
+  if (!D && yerel){ const oz = parseFloat(String(yerel.ozurlu || 0).replace(',', '.')) || 0, os = parseFloat(String(yerel.ozursuz || 0).replace(',', '.')) || 0;
+    D = {baslik: `Devamsızlık durumu (${tarihUzun(F.tarih)} tarihi itibarıyla)`, sutunlar: [['Özürlü', fmtNum(oz) + ' gün'], ['Özürsüz', fmtNum(os) + ' gün'], ['Toplam', fmtNum(oz + os) + ' gün']], cumle: '', onay: 'Velisi olarak öğrencimin yukarıdaki devamsızlık durumunu öğrendim.'}; }
+  if (!D) return '';
+  const n = D.sutunlar.length;
+  return `<table class="kg-dev"><tbody><tr class="bas"><td colspan="${n}">${esc(D.baslik)}</td></tr><tr class="ad">${D.sutunlar.map(([a]) => `<td>${esc(a)}</td>`).join('')}</tr>
+    <tr class="say">${D.sutunlar.map(([, v]) => `<td>${esc(v)}</td>`).join('')}</tr><tr class="not"><td colspan="${n}">${D.cumle ? esc(D.cumle) + '<br>' : ''}${esc(D.onay)}</td></tr></tbody></table>`;
 }
 function kagitSigdir(){
   const kutu = $('kagitKutu'), k = $('kagit'), tut = $('kagitTut'); if (!k.offsetWidth) return;
@@ -966,7 +992,10 @@ function ayarlarCiz(){
     <div class="kart"><h3>Okul</h3>
       <label class="alan"><span>Okulun tam adı</span><input type="text" id="aOkulAd" value="${esc(O.ad || '')}"></label>
       <div class="uc"><label class="alan"><span>İl</span><select id="aIl">${ILLER.map(i => `<option${i === O.il ? ' selected' : ''}>${esc(i)}</option>`).join('')}</select></label><label class="alan"><span>İlçe</span><input type="text" id="aIlce" value="${esc(O.ilce || '')}"></label><label class="alan"><span>Kurum kodu</span><input type="text" id="aKurum" value="${esc(O.kurum_kodu || '')}"></label></div>
-      <div class="dugmeler" style="margin-top:0"><button class="btn p" onclick="okulKaydet()">Kaydet</button><button class="btn" onclick="logoYukle()">${OZ.logo ? 'Logoyu değiştir' : 'Okul logosu yükle'}</button>${OZ.logo ? '<button class="btn" onclick="logoKaldir()">Logoyu kaldır</button>' : ''}</div>
+      <div class="dugmeler" style="margin-top:0"><button class="btn p" onclick="okulKaydet()">Kaydet</button></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)">${OZ.logo ? '<img class="logo-onizleme" id="aLogo" alt="Okul logosu">' : '<div class="logo-onizleme" style="display:grid;place-items:center;color:#94a3b8;font-size:11px;text-align:center">logo yok</div>'}
+        <div><b style="font-size:13px">Okul logosu</b><div style="font-size:12.5px;color:var(--mute);margin:2px 0 6px">Dilekçenin sol üst köşesine basılır (PNG ya da JPEG; saydam PNG en güzel durur).</div>
+        <div class="dugmeler" style="margin-top:0"><button class="btn kucuk" id="aLogoYukle" onclick="logoYukle()">${OZ.logo ? 'Logoyu değiştir' : 'Okul logosu yükle'}</button>${OZ.logo ? '<button class="btn kucuk" onclick="logoKaldir()">Logoyu kaldır</button>' : ''}</div></div></div>
       <div class="ileti" id="aOkulIleti"></div></div>
     <div class="kart"><h3>Dilekçe</h3>
       <label class="alan"><span>Konu</span><input type="text" id="aKonu" value="${esc(A.dilekce_konu || '')}" onchange="ayar({dilekce_konu: this.value})"></label>
@@ -1004,12 +1033,13 @@ function ayarlarCiz(){
       <p style="margin:0 0 8px;font-size:13px;color:var(--ink2)">Yazdırılan dilekçeler ve öğrenci belgeleri PDF olarak (şifresiz) bu bilgisayardaki Belgeler klasöründe durur; yer açmak için silinebilir, kayıtlar kasada kalır.</p>
       <div class="dugmeler" style="margin-top:0"><button class="btn" onclick="api.cagir('belge_klasoru_ac').then(r => r.klasor && toast(r.klasor))">Klasörü aç</button><button class="btn d" onclick="belgeleriSil()">PDF'leri sil</button></div></div>
   </div>`;
+  if ($('aLogo')) logoAl().then(l => { if ($('aLogo')) $('aLogo').src = l; });
 }
 async function ayar(g){ const r = await api.cagir('ayar_kaydet', g); if (r.hata){ toast(r.hata, 'err'); ayarlarCiz(); return; } OZ.ayarlar = r.ayarlar; if (SAYFA === 'dilekce') onizle(); }
 function metinIlk(){ ayar({dilekce_metin: "Velisi bulunduğum, aşağıda bilgileri yazılı öğrencimin {NEDEN} nedeniyle {TARIHLER} toplam {TOPLAM} süreyle, Millî Eğitim Bakanlığı Ortaöğretim Kurumları Yönetmeliği'nin 36. maddesi kapsamında izinli sayılması hususunda gereğini arz ederim."}).then(ayarlarCiz); }
 async function okulKaydet(){ const r = await api.cagir('okul_kaydet', {ad: $('aOkulAd').value, il: $('aIl').value, ilce: $('aIlce').value, kurum_kodu: $('aKurum').value}); if (r.hata){ ileti('aOkulIleti', r.hata, 'err'); return; } OZ.okul = r.okul; ustBilgi(); ileti('aOkulIleti', 'Kaydedildi.', 'ok'); }
-function logoYukle(){ resimSec(async veri => { const r = await api.cagir('okul_logo_yukle', veri); if (r.hata){ toast(r.hata, 'err'); return; } OZ.logo = true; ayarlarCiz(); toast('Logo kaydedildi.', 'ok'); }); }
-async function logoKaldir(){ await api.cagir('okul_logo_kaldir'); OZ.logo = false; ayarlarCiz(); }
+function logoYukle(){ resimSec(async veri => { const r = await api.cagir('okul_logo_yukle', veri); if (r.hata){ toast(r.hata, 'err'); return; } OZ.logo = true; LOGO_VERI = null; ayarlarCiz(); toast('Logo kaydedildi; dilekçelerde sol üstte görünecek.', 'ok'); }); }
+async function logoKaldir(){ await api.cagir('okul_logo_kaldir'); OZ.logo = false; LOGO_VERI = null; ayarlarCiz(); }
 function kapaliEkle(){ const T = (OZ.ayarlar.kapali_gunler || []).slice(); T.push({bas: '', bit: '', ad: ''}); OZ.ayarlar.kapali_gunler = T; ayarlarCiz(); }
 function kapaliDuzelt(i, k, v){ const T = (OZ.ayarlar.kapali_gunler || []).slice(); T[i] = Object.assign({}, T[i], {[k]: v}); if (k === 'bas' && !T[i].bit) T[i].bit = v; if (T[i].bas && T[i].bit) ayar({kapali_gunler: T}).then(() => { TK_ONBELLEK = {}; ayarlarCiz(); }); else OZ.ayarlar.kapali_gunler = T; }
 function kapaliSil(i){ const T = (OZ.ayarlar.kapali_gunler || []).slice(); T.splice(i, 1); ayar({kapali_gunler: T}).then(() => { TK_ONBELLEK = {}; ayarlarCiz(); }); }

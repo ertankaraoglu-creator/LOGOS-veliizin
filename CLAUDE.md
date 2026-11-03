@@ -13,6 +13,9 @@ ve LOGOS Disiplin'in (`../LOGOS DİSİPLİN/CLAUDE.md`) kuralları burada da ge�
   "push edildi mi?" diye hatırlatır.
 - Ertan yalnız şu klasöre bakar: `/Volumes/BİLGİSAYARIM/DERS DAĞITIMM/LOGOS Veli İzin/` (GitHub deposunun birebir kopyası). Claude ürettiği her
   dosyayı bu klasörün içine, depodaki aynı yere yazar (bulut oturumunda `device_commit_files`; yol NFD: `cd "$HOME"/mnt/LOGOS\ Veli*`).
+- GitHub: `ertankaraoglu-creator/LOGOS-veliizin` (gizli, `main`). Bulut oturumunda iş buluttaki kopyada yapılır, commit + push; Mac'e
+  aynı commit'ler git paketiyle gider (`git bundle create <eski>..main` → `device_commit_files` → Mac'te `git pull <paket> main`, paket silinir),
+  böylece Mac, GitHub ve bulut aynı kimlikleri taşır. Mac'teki VM'in GitHub şifresi yok; Mac'ten push Ertan'ın Terminal'inden olur.
 - Deneyler `raporlar/DENEYLER.md`'ye (tarih, komut, süre, sonuç, öğrenilen), her oturum `raporlar/OTURUM_RAPORU_<tarih>.md`'ye.
 
 ## Ürün (Ertan 03.11.2026)
@@ -31,6 +34,15 @@ ve LOGOS Disiplin'in (`../LOGOS DİSİPLİN/CLAUDE.md`) kuralları burada da ge�
   ve arayüzde `yakinlikMetni`, ikisi aynı tabloyla); **öğrenci belgesinin numarası yok** ve altında program adı yazmaz; yarım gün e-Okul'a
   **0,5** işlenir (istatistik de öyle sayar). Dilekçenin altında sağda "LOGOS Veli İzin · tarih saat" kalır, solda kayıt numarası
   varsayılan olarak açık gelir (`ayarlar.kayit_no_goster`, Ayarlar'dan kapatılır; Ertan 20:08).
+- **Devamsızlık durumu** (Ertan 03.11.2026 20:27-20:32: "dilekçenin yazıldığı gün itibarıyla özürlü ve özürsüz devamsızlık, bir nevi devamsızlık
+  mektubu gibi"; "idareci e-Okul'dan öğrencinin toplam devamsızlığına bakar ve dilekçeye ekler, mantık bu"): isteğe bağlı, **elle** (e-Okul'un
+  genel listesinde devamsızlık yok; aktarılmaz). Dilekçede tablonun altında ayrı bölüm: dilekçe tarihi itibarıyla özürlü / özürsüz / toplam;
+  dilekçenin o gün ve sonraki günleri "bu izinle birlikte toplam"a eklenir (geçmiş günler e-Okul'da zaten sayılı, iki kez eklenmez; uyarılar da
+  böyle sayar); Ayarlar'daki sınırlar ve kalan süre; "Velisi olarak öğrencimin yukarıdaki devamsızlık durumunu öğrendim." Tek kaynak
+  `izin.devamsizlik_ozeti` + `devamsizlik_metni`; önizleme aynı yazıyı Api'den alır (`izin_onizle` → `devamsizlik`). Formda öğrencinin son
+  dilekçesindeki sayılar önerilir (`son_devamsizlik`, "Bunu yaz"); yeni dilekçede bölüm kapalı açılır. CSV'de iki sütun.
+- **Okul logosu**: Ayarlar › Okul (PNG / JPEG; uzun kenar 480 px, saydam kenar kırpılır; önizlemesi orada), dilekçenin sol üstüne basılır,
+  `ayarlar.logo_goster` ile gizlenir. Öğrenci belgesine basılmaz (e-Okul'un belgesinde yok). Arayüz logoyu bir kez alır (`LOGO_VERI`).
 
 ## Veri ve güvenlik
 - Öğrenci listesi, fotoğraflar, kimlik numaraları, veli bilgileri okulun hassas verisidir. **Veri okuldan çıkmaz**: program hiçbir sunucuya
