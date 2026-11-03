@@ -521,7 +521,7 @@ const pd = s => { const [y, m, d] = String(s).slice(0, 10).split('-').map(Number
 const iso = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 const addD = (s, n) => { const d = pd(s); d.setDate(d.getDate() + n); return iso(d); };
 let BAS = {}, OZ = {}, KIRLI = false, LOGO_VERI = null;
-async function logoAl(){ if (LOGO_VERI === null){ const r = await api.cagir('okul_logo'); LOGO_VERI = r.logo || ''; } return LOGO_VERI; }
+async function logoAl(){ if (LOGO_VERI === null){ const r = await api.cagir('okul_logo'); if (r.hata) return ''; LOGO_VERI = r.logo || ''; } return LOGO_VERI; }   // kilitliyken alınmaz, boş diye de saklanmaz
 let MESGUL = new Set();
 async function birKez(ad, fn){ if (MESGUL.has(ad)) return; MESGUL.add(ad); try { return await fn(); } finally { MESGUL.delete(ad); } }
 function kirli(v){ KIRLI = v !== false; api.cagir('kirli', KIRLI); }
@@ -786,7 +786,7 @@ function ozetCiz(r){
   $('dkOzet').innerHTML = `<b>${t ? 'Toplam ' + (t === .5 ? 'yarım gün' : fmtNum(t) + ' gün') : 'Gün seçilmedi'}</b>${esc(durum)}${r && r.hata ? ' · <span style="color:var(--warn-ink)">' + esc(r.hata) + '</span>' : ''}`;
   $('btnYazdir').innerHTML = `<svg viewBox="0 0 24 24"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg>${F.no_metni && !KIRLI ? 'Yeniden yazdır' : 'Kaydet ve yazdır'}`;
 }
-function kgLogoYukle(){ if ($('kgLogo') && !LOGO_VERI) logoAl().then(l => { const g = $('kgLogo'); if (l && g) { g.src = l; g.style.visibility = ''; } }); }   // gelene kadar kırık resim simgesi görünmesin
+function kgLogoYukle(){ if ($('kgLogo') && !LOGO_VERI && $('ana').hidden === false) logoAl().then(l => { const g = $('kgLogo'); if (l && g) { g.src = l; g.style.visibility = ''; } }); }   // gelene kadar kırık resim simgesi görünmesin
 function kagitCiz(r, hata){
   const k = $('kagit'); const A = OZ.ayarlar || {}; const okul = OZ.okul || {};
   const antet = (r && r.antet) || (ONZ && ONZ.antet) || OZ.antet || ['T.C.', '', (okul.ad || '') + ' Müdürlüğüne'];
