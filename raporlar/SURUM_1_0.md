@@ -26,14 +26,18 @@ Kapsam Ertan'ın (03.11.2026), sıra Claude'un; gerekçeler "Sıra" bölümünde
 1. **Okulda deneme (Ertan)**: gerçek PDF'lerle aktarma, bir günün dilekçeleri, yazıcıya doğrudan gönderme (Windows'ta `startfile(... 'print')`
    okulun PDF okuyucusuna bağlı; olmazsa "önce PDF açılsın" ayarı). Bulguları `raporlar/DENEYLER.md`'ye.
    Gerekçe: dilekçe akışı günde 20 kez işleyecek; yazdırma yolu ve gerçek PDF düzeni ancak okulda görülür.
-2. **Paketleme** (`paket/`): `veli_izin.spec`, `derle.py`, `duman.py`, `kurulum.iss`, GitHub derlemesi (`paket` dalı) - Disiplin'in
+2. **Site rehber sayfası** (Ertan 03.11.2026 22:14: "hatırlatırsan yaparız"; okul denemesinden sonra, Claude hatırlatır): dersdagitim.com'da
+   "veli izin dilekçesi örneği" sayfası: ücretsiz boş dilekçe formu (PDF), yönetmeliğin 36. maddesinin sade anlatımı, özür beyanı ile
+   izin isteğinin farkı; Disiplin'in rehber sayfalarının düzeninde (`../LOGOS/site/disiplin-kurulu-evraklari.html`). Gerekçe: okullarda
+   aranan "veli izin dilekçesi örneği / PDF / Word"; arayan idareci önce o sayfaya, oradan programa gelir.
+3. **Paketleme** (`paket/`): `veli_izin.spec`, `derle.py`, `duman.py`, `kurulum.iss`, GitHub derlemesi (`paket` dalı) - Disiplin'in
    kalıbıyla. Gerekçe: Ertan'ın eski PC'de ve okulda denemesi için exe gerek.
-3. **Öğrenci belgesi düzeni** gerçek belgeyle yan yana karşılaştırma (Ertan'ın örneği); müdür / müdür yardımcısı imza satırları, burslu / yatılı,
+4. **Öğrenci belgesi düzeni** gerçek belgeyle yan yana karşılaştırma (Ertan'ın örneği); müdür / müdür yardımcısı imza satırları, burslu / yatılı,
    program adı; e-Okul'daki belge numarası biçimi.
-4. Dilekçe ince ayar: dilekçe cümlesinin okuldan okula farkı (Ayarlar'daki kalıp yeter mi), onay kutusu metni, logo yeri.
-5. İstatistik: sene sonu PDF raporu (Disiplin'deki `yil_sonu` gibi), aylık grafikler.
-6. Hakkında › açık kaynak listesi (Disiplin'deki `acik_kaynak.py`), sürüm notları, kurulumda `AppCopyright`.
-7. Mac paketi.
+5. Dilekçe ince ayar: dilekçe cümlesinin okuldan okula farkı (Ayarlar'daki kalıp yeter mi), onay kutusu metni, logo yeri.
+6. İstatistik: sene sonu PDF raporu (Disiplin'deki `yil_sonu` gibi), aylık grafikler.
+7. Hakkında › açık kaynak listesi (Disiplin'deki `acik_kaynak.py`), sürüm notları, kurulumda `AppCopyright`.
+8. Mac paketi.
 
 ## Cevaplanan sorular (Ertan 03.11.2026, 20:03)
 - Öğrenci belgesinin numarası yok: belgeye numara yazılmaz (Kayıtlar'daki "Sıra" yalnız LOGOS'un kendi listesi).
