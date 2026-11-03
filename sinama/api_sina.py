@@ -72,6 +72,7 @@ class ApiSina(unittest.TestCase):
         for s in ('KONAK KAYMAKAMLIĞI', 'ÇİĞDEM DEMİR', '902', 'EMİNE YILDIRIM', 'yakınının vefatı', '1,5 (bir buçuk) gün', '36. maddesi', 'Okul idaresi', 'Kayıt no', '3 gün özürlü, 1 gün özürsüz'):
             self.assertIn(s, m, s)
         self.assertNotIn('None', m)
+        self.assertIn('LOGOS Veli İzin', m); self.assertIn('Kayıt no', m); self.assertTrue(A.ozet()['ayarlar']['kayit_no_goster'])     # Ertan 20:08: ikisi de kalır, kayıt no varsayılan açık
         self.assertIn('(öğrencinin annesi)', m); self.assertIn('Öğrencinin annesi', m); self.assertNotIn('öğrencinin anne)', m)
         # aynı güne ikinci dilekçe: önce uyarı, uyarılar görüldü deyince kayıt
         izin2 = dict(izin, veli={'ad': 'Ayşe Kaya', 'yakinlik': 'Diğer', 'yakinlik_aciklama': 'teyzesi', 'tel': '5321234567', 'tc': '10000000146'}, gunler={g2: 'tam'}, devamsizlik=None)
@@ -92,6 +93,8 @@ class ApiSina(unittest.TestCase):
         m = pdf_metni(r['pdf']); o = A.ogrenci(1101)['ogrenci']
         for s in ('ÖĞRENCİ BELGESİ', 'İZMİR VALİLİĞİ', o['ad'], '10000000146', '11. Sınıf / C Şubesi', 'OKUL MÜDÜRÜ', 'MÜDÜR YARDIMCISI'): self.assertIn(s, m, s)
         self.assertNotIn('LOGOS', m)                                                                           # resmî belgede program adı yok
+        A.ayar_kaydet({'kayit_no_goster': False}); m = pdf_metni(A.izin_yazdir(id1)['pdf']); self.assertNotIn('Kayıt no', m); self.assertIn('LOGOS Veli İzin', m)
+        A.ayar_kaydet({'kayit_no_goster': True})
         r = A.ogrenci_belgesi(901, {}, yazdir=False); self.assertTrue(r['ok']); self.assertEqual(len(A.belgeler()['belgeler']), 2)
         self.assertTrue(A.ogrenci_sil(901)['ayrildi'])                                                         # belgesi olan öğrenci silinmez, ayrıldı olur
         # ---- istatistik

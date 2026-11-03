@@ -29,7 +29,8 @@ ve LOGOS Disiplin'in (`../LOGOS DİSİPLİN/CLAUDE.md`) kuralları burada da ge�
 
 - Belgeler (Ertan 03.11.2026, 20:03): dilekçe **tek nüsha**; dilekçede yakınlık iyelik ekiyle ("öğrencinin annesi", "babası", `izin.yakinlik_metni`
   ve arayüzde `yakinlikMetni`, ikisi aynı tabloyla); **öğrenci belgesinin numarası yok** ve altında program adı yazmaz; yarım gün e-Okul'a
-  **0,5** işlenir (istatistik de öyle sayar).
+  **0,5** işlenir (istatistik de öyle sayar). Dilekçenin altında sağda "LOGOS Veli İzin · tarih saat" kalır, solda kayıt numarası
+  varsayılan olarak açık gelir (`ayarlar.kayit_no_goster`, Ayarlar'dan kapatılır; Ertan 20:08).
 
 ## Veri ve güvenlik
 - Öğrenci listesi, fotoğraflar, kimlik numaraları, veli bilgileri okulun hassas verisidir. **Veri okuldan çıkmaz**: program hiçbir sunucuya

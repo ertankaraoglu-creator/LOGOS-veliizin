@@ -28,7 +28,7 @@ Kapsam Ertan'ın (03.11.2026), sıra Claude'un; gerekçeler "Sıra" bölümünde
 - Yarım gün e-Okul'a 0,5 gün işlenir: istatistik ve CSV böyle sayıyor (`izin.gun_degeri`).
 - Öğrenci belgesinin altında program adı yazmaz (kaldırıldı).
 - Dilekçede yakınlık iyelik ekiyle: "öğrencinin annesi / babası / vasisi" (`izin.yakinlik_metni`; Diğer'de "teyze" → "teyzesi").
+- Dilekçenin sağ altındaki "LOGOS Veli İzin · tarih saat" kalır; sol alttaki kayıt numarası varsayılan olarak açık, Ayarlar'dan kapatılabilir (20:08).
 
 ## Açık sorular (Ertan'a)
-- Dilekçenin sağ altındaki "LOGOS Veli İzin · tarih saat" satırı da kalksın mı? (Sol alttaki kayıt no Ayarlar'dan kapatılabiliyor.)
 - Kimlik numarası olmayan okullar (kimlik listesi yüklenmezse) için öğrenci belgesinde elle doldurma yeter mi?
