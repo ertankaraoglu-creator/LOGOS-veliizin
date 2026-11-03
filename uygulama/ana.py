@@ -321,7 +321,7 @@ class Api:
         k = self._acik(); self._dokun(); v = k.veri; Y = self._Y(); yil = self._yil()
         bugun = isgunu.bugun().isoformat(); izinler = [i for i in Y['izinler'] if not i.get('silindi')]
         return {'okul': self._okul(), 'ayarlar': self._ayarlar(), 'kasa': k.bilgi(), 'yil': yil, 'yillar': sorted(v.get('yillar') or {}, reverse=True),
-                'takvim_yili': isgunu.ogretim_yili(), 'bugun': bugun, 'logo': bool(v.get('okul_logo')),
+                'takvim_yili': isgunu.ogretim_yili(), 'bugun': bugun, 'logo': bool(v.get('okul_logo')), 'antet': BL.antet(self._okul(), hitap=True),
                 'guvenlik': (v.get('guvenlik') or [])[-5:], 'gelistirici_anahtar': GL.acik_anahtar() is not None,
                 'sayilar': {'ogrenci': sum(1 for o in Y['ogrenciler'] if o.get('durum') != 'ayrildi'), 'sinif': len(Y.get('siniflar') or {}),
                             'izin': len(izinler), 'izin_bugun': sum(1 for i in izinler if i.get('tarih') == bugun),

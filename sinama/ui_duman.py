@@ -79,6 +79,8 @@ def main(ekran_klasoru=None):
         sayfa.wait_for_function("document.getElementById('aLogo') && document.getElementById('aLogo').src.startsWith('data:image/png')")
         ekran.al(sayfa, 'ayarlar-logo')
         # ---- dilekçe: ara (Türkçe harfsiz), seç
+        sayfa.click('aside button[data-sayfa=dilekce]'); expect(sayfa.locator('#kagit .kg-hitap')).to_have_text('Çınar Mesleki ve Teknik Anadolu Lisesi Müdürlüğüne')
+        expect(sayfa.locator('#kagit .antet')).to_contain_text('KONAK KAYMAKAMLIĞI')
         sayfa.click('aside button[data-sayfa=dilekce]')
         sayfa.fill('#q', 'cigdem'); sayfa.wait_for_selector('#sonuclar .snc')
         expect(sayfa.locator('#sonuclar .snc').first).to_contain_text('ÇİĞDEM DEMİR')
@@ -182,12 +184,19 @@ def main(ekran_klasoru=None):
         sayfa.fill('#kltSifre', '0000'); sayfa.click('#kltAc'); sayfa.wait_for_selector('#kltIleti:has-text("yanlış")')
         ekran.al(sayfa, 'kilit')
         U.kilit_ac(sayfa)
+        sayfa.click('aside button[data-sayfa=dilekce]')                                  # kilit ekranında çizilen boş kâğıt okul bilgisiyle yenilenir
+        expect(sayfa.locator('#kagit .kg-hitap')).to_have_text('Çınar Mesleki ve Teknik Anadolu Lisesi Müdürlüğüne')
         expect(sayfa.locator('#kayitSay')).to_have_text('1')
         # ---- kurtarma anahtarıyla aç, yeni şifre
         sayfa.click('aside .kilitle'); sayfa.wait_for_selector('#kilit:not([hidden])')
         sayfa.click('text=Şifremi unuttum'); sayfa.fill('#kltAnahtar', anahtar); sayfa.fill('#kltYeni', '1357')
         sayfa.click('text=Aç ve şifreyi değiştir'); sayfa.wait_for_selector('#ana:not([hidden])')
         sayfa.click('aside .kilitle'); U.kilit_ac(sayfa, '1357')
+        # program baştan açılınca (okul bilgisi henüz yokken kilit ekranı çizilir) boş kâğıdın başlığı kasa açıldıktan sonra doğru
+        sayfa.click('aside .kilitle'); sayfa.wait_for_selector('#kilit:not([hidden])'); sayfa.reload(); U.kilit_ac(sayfa, '1357')
+        sayfa.click('aside button[data-sayfa=dilekce]')
+        expect(sayfa.locator('#kagit .kg-hitap')).to_have_text('Çınar Mesleki ve Teknik Anadolu Lisesi Müdürlüğüne')
+        expect(sayfa.locator('#kagit .antet')).to_contain_text('KONAK KAYMAKAMLIĞI')
         # ---- Hakkında
         sayfa.click('#hakkindaDugme'); sayfa.wait_for_selector('#modal:not([hidden]) >> text=Gizlilik beyanı'); ekran.al(sayfa, 'hakkinda')
         sayfa.keyboard.press('Escape'); sayfa.wait_for_selector('#modal', state='hidden')

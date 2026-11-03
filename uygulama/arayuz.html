@@ -612,7 +612,7 @@ async function uygulamaAc(){
   const r = await api.cagir('ozet');
   if (r.hata){ kilitEkrani(false); return; }
   OZ = r; $('kenar').hidden = false; $('ana').hidden = false; ustBilgi();
-  if (!$('kagit').innerHTML) formuCiz();
+  if (!OGR) formuCiz();                       // kilit ekranında okul bilgisi olmadan çizilen boş kâğıt yenilensin
   sayfa(SAYFA || 'dilekce'); await sonDilekceler();
   if (!OTO_AKIS){ OTO_AKIS = setInterval(async () => { if ($('ana').hidden) return; const d = await api.cagir('durum'); if (d && d.acik === false) kilitEkrani(!!d.oto_kilit); }, 15000); }
 }
@@ -786,12 +786,13 @@ function ozetCiz(r){
   $('dkOzet').innerHTML = `<b>${t ? 'Toplam ' + (t === .5 ? 'yarım gün' : fmtNum(t) + ' gün') : 'Gün seçilmedi'}</b>${esc(durum)}${r && r.hata ? ' · <span style="color:var(--warn-ink)">' + esc(r.hata) + '</span>' : ''}`;
   $('btnYazdir').innerHTML = `<svg viewBox="0 0 24 24"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg>${F.no_metni && !KIRLI ? 'Yeniden yazdır' : 'Kaydet ve yazdır'}`;
 }
+function kgLogoYukle(){ if ($('kgLogo') && !LOGO_VERI) logoAl().then(l => { const g = $('kgLogo'); if (l && g) { g.src = l; g.style.visibility = ''; } }); }   // gelene kadar kırık resim simgesi görünmesin
 function kagitCiz(r, hata){
   const k = $('kagit'); const A = OZ.ayarlar || {}; const okul = OZ.okul || {};
-  const antet = (r && r.antet) || (ONZ && ONZ.antet) || ['T.C.', '', (okul.ad || '') + ' Müdürlüğüne'];
+  const antet = (r && r.antet) || (ONZ && ONZ.antet) || OZ.antet || ['T.C.', '', (okul.ad || '') + ' Müdürlüğüne'];
   const ph = t => `<span class="ph">${esc(t)}</span>`;
-  let h = `<div class="kg-ust"><div>${A.logo_goster !== false && OZ.logo ? '<img class="logo" id="kgLogo" src="" alt="">' : ''}</div><div class="antet">${antet.slice(0, -1).map(esc).join('<br>')}</div><div class="tarih">${esc((r && r.tarih_uzun) || tarihUzun(F.tarih))}</div></div><div class="kg-hitap">${esc(antet[antet.length - 1])}</div>`;
-  if (!OGR){ k.innerHTML = h + `<div class="kg-bos">Öğrenciyi seçin.<br>Dilekçe, siz formu doldurdukça burada oluşur.</div>`; kagitSigdir(); return; }
+  let h = `<div class="kg-ust"><div>${A.logo_goster !== false && OZ.logo ? `<img class="logo" id="kgLogo" src="${LOGO_VERI || ''}" alt=""${LOGO_VERI ? '' : ' style="visibility:hidden"'}>` : ''}</div><div class="antet">${antet.slice(0, -1).map(esc).join('<br>')}</div><div class="tarih">${esc((r && r.tarih_uzun) || tarihUzun(F.tarih))}</div></div><div class="kg-hitap">${esc(antet[antet.length - 1])}</div>`;
+  if (!OGR){ k.innerHTML = h + `<div class="kg-bos">Öğrenciyi seçin.<br>Dilekçe, siz formu doldurdukça burada oluşur.</div>`; kagitSigdir(); kgLogoYukle(); return; }
   const o = OGR; const v = F.veli; const yak = yakinlikMetni(v.yakinlik, v.yakinlik_aciklama);
   let metin;
   if (r && r.metin){ metin = esc(r.metin); for (const p of [r.tarihler, r.toplam_metni]) if (p) metin = metin.replace(esc(p), `<b>${esc(p)}</b>`); }
@@ -810,7 +811,7 @@ function kagitCiz(r, hata){
   if (A.onay_kutusu !== false) h += `<div class="kg-onay"><div><b>Okul idaresi</b><br>Öğrencinin yukarıda belirtilen günlerde izinli sayılması uygundur.<div style="margin-top:4mm">Tarih: ...... / ...... / 20......</div></div><div class="who"><div class="sp"></div><div>${esc(A.onay_ad) || '&nbsp;'}</div><div>${esc(A.onay_unvan || 'Müdür Yardımcısı')}</div></div></div>`;
   h += `<div class="kg-alt"><span>${A.kayit_no_goster !== false && F.no_metni ? 'Kayıt no: ' + esc(F.no_metni) : ''}</span><span>LOGOS Veli İzin</span></div>`;
   k.innerHTML = h;
-  if ($('kgLogo')) logoAl().then(l => { if (l && $('kgLogo')) $('kgLogo').src = l; });
+  kgLogoYukle();
   kagitSigdir();
 }
 function devBolumu(D, yerel){
@@ -1061,7 +1062,7 @@ function ayarlarCiz(){
 }
 async function ayar(g){ const r = await api.cagir('ayar_kaydet', g); if (r.hata){ toast(r.hata, 'err'); ayarlarCiz(); return; } OZ.ayarlar = r.ayarlar; if (SAYFA === 'dilekce') onizle(); }
 function metinIlk(){ ayar({dilekce_metin: "Velisi bulunduğum, aşağıda bilgileri yazılı öğrencimin {NEDEN} nedeniyle {TARIHLER} toplam {TOPLAM} süreyle, Millî Eğitim Bakanlığı Ortaöğretim Kurumları Yönetmeliği'nin 36. maddesi kapsamında izinli sayılması hususunda gereğini arz ederim."}).then(ayarlarCiz); }
-async function okulKaydet(){ const r = await api.cagir('okul_kaydet', {ad: $('aOkulAd').value, il: $('aIl').value, ilce: $('aIlce').value, kurum_kodu: $('aKurum').value}); if (r.hata){ ileti('aOkulIleti', r.hata, 'err'); return; } OZ.okul = r.okul; ustBilgi(); ileti('aOkulIleti', 'Kaydedildi.', 'ok'); }
+async function okulKaydet(){ const r = await api.cagir('okul_kaydet', {ad: $('aOkulAd').value, il: $('aIl').value, ilce: $('aIlce').value, kurum_kodu: $('aKurum').value}); if (r.hata){ ileti('aOkulIleti', r.hata, 'err'); return; } const oz = await api.cagir('ozet'); if (!oz.hata) OZ = oz; else OZ.okul = r.okul; ustBilgi(); ileti('aOkulIleti', 'Kaydedildi.', 'ok'); if (!OGR) kagitCiz(null); }
 function logoYukle(){ resimSec(async veri => { const r = await api.cagir('okul_logo_yukle', veri); if (r.hata){ toast(r.hata, 'err'); return; } OZ.logo = true; LOGO_VERI = null; ayarlarCiz(); toast('Logo kaydedildi; dilekçelerde sol üstte görünecek.', 'ok'); }); }
 async function logoKaldir(){ await api.cagir('okul_logo_kaldir'); OZ.logo = false; LOGO_VERI = null; ayarlarCiz(); }
 function kapaliEkle(){ const T = (OZ.ayarlar.kapali_gunler || []).slice(); T.push({bas: '', bit: '', ad: ''}); OZ.ayarlar.kapali_gunler = T; ayarlarCiz(); }
