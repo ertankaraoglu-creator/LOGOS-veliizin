@@ -1,0 +1,26 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Kasa dosyaları (okulun şifreli verisi) ve yedekleri depoya girmez
+*.lvk
+*.lvk.yaziliyor
+yedekler/
+
+# Gerçek okul verisiyle deneme yalnız Ertan'ın bilgisayarında (CLAUDE.md "Veri ve güvenlik"); gerçek e-Okul PDF'leri de burada
+gizli/
+*.PDF
+
+# Paketleme çıktıları
+/build/
+/dist/
+
+# Sınama çıktıları (ekran görüntüleri)
+ekran/
+ornek/
+
+# Geliştiriciden kurtarma: gizli anahtar ve defter yalnız Ertan'ın Mac'inde (uygulama/gelistirici.py)
+*.key
+gizli-anahtar.txt
+kurtarma_defteri.csv

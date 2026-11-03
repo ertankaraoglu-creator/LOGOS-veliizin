@@ -1,0 +1,12 @@
+{
+  "_aciklama": "Resmî tatiller ve MEB çalışma takvimi: iş günü hesabı (kurul karar süresi 192/3, itiraz 169/3, tedbir 175) ve okul günü (uzaklaştırma 172/1-a) bunlardan. Sabit günler 2429 sayılı Ulusal Bayram ve Genel Tatiller Hakkında Kanun'dan; dini bayramlar Diyanet takvimine göre basında yayımlanan tarihlerden (2027: CNN Türk, 14.10.2026'da okundu). Ara tatiller ve yarıyıl tatili iş günü sayılmaz (Ertan, 15.10.2026); okul_takvimi MEB'in duyurusundan. Yarım günler (28 Ekim öğleden sonra, arifeler) iş günü sayılır. Dosyada olmayan bir yılın bayramları ya da takvimi için program uyarır; yeni yıl gelince bu dosyaya eklenir.",
+  "kaynak": ["https://www.cnnturk.com/turkiye/2027-resmi-tatiller-takvimi-dini-bayramlar-resmi-tatil-gunler-ne-zaman-2027-ramazan-ve-kurban-bayrami-tarihleri-3447415", "https://www.meb.gov.tr/2026-2027-egitim-ogretim-yili-takvimi-aciklandi/haber/41057/tr"],
+  "sabit": {"01-01": "Yılbaşı", "04-23": "Ulusal Egemenlik ve Çocuk Bayramı", "05-01": "Emek ve Dayanışma Günü", "05-19": "Atatürk'ü Anma, Gençlik ve Spor Bayramı", "07-15": "Demokrasi ve Millî Birlik Günü", "08-30": "Zafer Bayramı", "10-29": "Cumhuriyet Bayramı"},
+  "dini": {
+    "2026": {"2026-03-20": "Ramazan Bayramı 1. gün", "2026-03-21": "Ramazan Bayramı 2. gün", "2026-03-22": "Ramazan Bayramı 3. gün", "2026-05-27": "Kurban Bayramı 1. gün", "2026-05-28": "Kurban Bayramı 2. gün", "2026-05-29": "Kurban Bayramı 3. gün", "2026-05-30": "Kurban Bayramı 4. gün"},
+    "2027": {"2027-03-09": "Ramazan Bayramı 1. gün", "2027-03-10": "Ramazan Bayramı 2. gün", "2027-03-11": "Ramazan Bayramı 3. gün", "2027-05-16": "Kurban Bayramı 1. gün", "2027-05-17": "Kurban Bayramı 2. gün", "2027-05-18": "Kurban Bayramı 3. gün", "2027-05-19": "Kurban Bayramı 4. gün"}
+  },
+  "okul_takvimi": {
+    "2026-2027": {"baslangic": "2026-09-14", "bitis": "2027-06-25", "tatiller": [{"bas": "2026-11-16", "bit": "2026-11-20", "ad": "Birinci dönem ara tatili"}, {"bas": "2027-01-25", "bit": "2027-02-05", "ad": "Yarıyıl tatili"}, {"bas": "2027-03-08", "bit": "2027-03-12", "ad": "İkinci dönem ara tatili"}], "kaynak": "https://www.meb.gov.tr/2026-2027-egitim-ogretim-yili-takvimi-aciklandi/haber/41057/tr", "okuma": "2026-10-15", "not": "MEB haberi 13.06.2026: birinci dönem 14 Eylül 2026 - 22 Ocak 2027, ikinci dönem 8 Şubat - 25 Haziran 2027"}
+  }
+}

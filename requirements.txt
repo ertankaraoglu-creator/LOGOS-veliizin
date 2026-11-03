@@ -1,0 +1,6 @@
+# LOGOS Veli İzin masaüstü uygulaması (python -m uygulama.ana)
+pywebview>=5        # masaüstü pencere (tarayıcı kipinde gerekmez)
+cryptography>=42    # şifreli kasa: AES-256-GCM
+pdfplumber>=0.11    # e-Okul raporlarından öğrenci listesi ve fotoğraflar
+reportlab>=4        # dilekçe ve öğrenci belgesi PDF'leri; sınamaların uydurma e-Okul PDF'leri
+Pillow>=10          # fotoğraf kırpma ve küçültme (pdfplumber de ister)
