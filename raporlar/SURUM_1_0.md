@@ -16,6 +16,7 @@ Kapsam Ertan'ın (03.11.2026), sıra Claude'un; gerekçeler "Sıra" bölümünde
 
 ## 0.1.1 paket (03.11.2026, 20:39 Ertan: "yayınlayalım, yanımdaki PC ile deneyeceğim")
 - `paket/` ve GitHub derlemesi (Disiplin'in kalıbı); Linux'ta deneme derlemesi duman sınamasından geçti (D4). Windows paketi `yayin` dalıyla.
+- Windows: v0.1.1 yayınlandı (GitHub Releases; ikinci derlemede bütün sınamalar geçti, D5). Ertan'ın PC'sinde deneme sırada.
 
 ## Sıra
 1. **Okulda deneme (Ertan)**: gerçek PDF'lerle aktarma, bir günün dilekçeleri, yazıcıya doğrudan gönderme (Windows'ta `startfile(... 'print')`

@@ -60,3 +60,6 @@ gizli): üç commit buluttan push edildi (Mac'teki commit'ler git paketiyle taş
 - Ertan: "yayınlayalım, yanımdaki PC ile deneyeceğim". `paket/` yazıldı (spec, derle, duman, kurulum, sürüm notu) ve `.github/workflows/paket.yml`.
   Linux deneme paketi duman sınamasından geçti. Sürüm 0.1.1; `yayin` dalına itildi: Windows'ta derlenip bu depoda sürüm açılacak.
 - Fark edilen: depo herkese açık açılmış (Disiplin gizli). İçinde gerçek veri yok; gizli olsun mu, Ertan'a soruldu.
+- İlk Windows derlemesi kur / aç / kaldır adımında düştü (D5); düzeltildi. İkinci derleme (4790208) bütün adımlardan geçti, **v0.1.1** bu
+  depoda yayınlandı: `LOGOS-Veli-Izin-kurulum.exe` 29,4 MB (sha256 a1bd9d20…), `LOGOS-Veli-Izin-windows.exe` 27,8 MB. Kurulum dosyası
+  Ertan'a sohbetten gönderildi; yanındaki PC'de (i5-5200, 8 GB) deneyecek. Yazıcıya doğrudan gönderme ilk kez orada denenecek.
