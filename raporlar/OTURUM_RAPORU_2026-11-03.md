@@ -69,3 +69,5 @@ gizli): üç commit buluttan push edildi (Mac'teki commit'ler git paketiyle taş
   İsteği: fareyle üstüne gelince kutucuklar daha mavi ve öne doğru büyüsün (eklendi; yazı kartları büyümez, yalnız mavileşir).
 - Sürüm 1.0.0, `yayin` dalıyla. Ertan yayından sonra başka bir şey isteyecek.
 - Sorulan, cevap bekleyen: yazıcıya doğrudan gitti mi, gerçek e-Okul PDF'leri doğru geldi mi, eski PC'de açılış süresi.
+- **v1.0.0 yayınlandı** (dd1f06f; Windows derlemesi ve bütün sınamalar geçti): `LOGOS-Veli-Izin-kurulum.exe` 29,4 MB (sha256 6b5c6b9e…),
+  `LOGOS-Veli-Izin-windows.exe` 27,8 MB. Kurulum dosyası Ertan'a sohbetten gönderildi. D6'daki başarısızlık Windows'ta çıkmadı.
