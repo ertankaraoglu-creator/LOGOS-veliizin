@@ -18,6 +18,10 @@ Kapsam Ertan'ın (03.11.2026), sıra Claude'un; gerekçeler "Sıra" bölümünde
 - `paket/` ve GitHub derlemesi (Disiplin'in kalıbı); Linux'ta deneme derlemesi duman sınamasından geçti (D4). Windows paketi `yayin` dalıyla.
 - Windows: v0.1.1 yayınlandı (GitHub Releases; ikinci derlemede bütün sınamalar geçti, D5). Ertan'ın PC'sinde deneme sırada.
 
+## 1.0.0 (03.11.2026, Ertan 21:11: "sürümü 1.0.0 yaparak yayınlayalım")
+- Ertan 0.1.1'i yanındaki PC'de inceledi ("güzel görünüyor"). İki düzeltme: açılış görselinde "LOGOS Disiplin" yazıyordu (yeni görsel,
+  `acilis_uret.py`); fareyle üstüne gelince kutucuklar öne çıkıp maviye döner. Sürüm 1.0.0; aşağıdaki sıra 1.x'e kalır.
+
 ## Sıra
 1. **Okulda deneme (Ertan)**: gerçek PDF'lerle aktarma, bir günün dilekçeleri, yazıcıya doğrudan gönderme (Windows'ta `startfile(... 'print')`
    okulun PDF okuyucusuna bağlı; olmazsa "önce PDF açılsın" ayarı). Bulguları `raporlar/DENEYLER.md`'ye.

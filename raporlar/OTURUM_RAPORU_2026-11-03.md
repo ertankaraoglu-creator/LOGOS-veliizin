@@ -63,3 +63,9 @@ gizli): üç commit buluttan push edildi (Mac'teki commit'ler git paketiyle taş
 - İlk Windows derlemesi kur / aç / kaldır adımında düştü (D5); düzeltildi. İkinci derleme (4790208) bütün adımlardan geçti, **v0.1.1** bu
   depoda yayınlandı: `LOGOS-Veli-Izin-kurulum.exe` 29,4 MB (sha256 a1bd9d20…), `LOGOS-Veli-Izin-windows.exe` 27,8 MB. Kurulum dosyası
   Ertan'a sohbetten gönderildi; yanındaki PC'de (i5-5200, 8 GB) deneyecek. Yazıcıya doğrudan gönderme ilk kez orada denenecek.
+
+## Ek (21:08-21:11) - Ertan'ın PC denemesi ve 1.0.0
+- Ertan: "güzel görünüyor, PC'de inceledim". Gördüğü: açılış görselinde "LOGOS Disiplin" yazıyor (düzeltildi, `paket/acilis_uret.py`).
+  İsteği: fareyle üstüne gelince kutucuklar daha mavi ve öne doğru büyüsün (eklendi; yazı kartları büyümez, yalnız mavileşir).
+- Sürüm 1.0.0, `yayin` dalıyla. Ertan yayından sonra başka bir şey isteyecek.
+- Sorulan, cevap bekleyen: yazıcıya doğrudan gitti mi, gerçek e-Okul PDF'leri doğru geldi mi, eski PC'de açılış süresi.

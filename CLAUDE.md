@@ -43,6 +43,11 @@ ve LOGOS Disiplin'in (`../LOGOS DİSİPLİN/CLAUDE.md`) kuralları burada da ge�
   dilekçesindeki sayılar önerilir (`son_devamsizlik`, "Bunu yaz"); yeni dilekçede bölüm kapalı açılır. CSV'de iki sütun.
 - **Okul logosu**: Ayarlar › Okul (PNG / JPEG; uzun kenar 480 px, saydam kenar kırpılır; önizlemesi orada), dilekçenin sol üstüne basılır,
   `ayarlar.logo_goster` ile gizlenir. Öğrenci belgesine basılmaz (e-Okul'un belgesinde yok). Arayüz logoyu bir kez alır (`LOGO_VERI`).
+- **Fareyle üstüne gelme** (Ertan 03.11.2026 21:11: "kutucuklar biraz daha mavi ve belirgin şekilde öne doğru boyutlansın"): tıklanan küçük kutular
+  (düğme, çip, takvim günü, sayı kutusu, arama sonucu, menü) hafifçe büyür ve maviye döner; içinde yazı yazılan kartlar büyümez, yalnız kenarı
+  ve gölgesi mavileşir (İstatistik kartları biraz yükselir). `@media (hover: hover)`, hareket azaltma tercihinde kapalı.
+- Açılış görseli (`paket/acilis.png`, Windows'ta paket açılırken) `paket/acilis_uret.py` ile üretilir (adı `surum.AD`'dan; Disiplin'den kopya
+  "Disiplin" yazıyordu, Ertan 21:11).
 
 ## Veri ve güvenlik
 - Öğrenci listesi, fotoğraflar, kimlik numaraları, veli bilgileri okulun hassas verisidir. **Veri okuldan çıkmaz**: program hiçbir sunucuya

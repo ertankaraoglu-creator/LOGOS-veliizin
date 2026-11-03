@@ -1,3 +1,10 @@
+## LOGOS Veli İzin 1.0.0 (03.11.2026)
+
+- Fareyle üstüne gelince düğmeler, takvim günleri, çipler ve sayı kutuları hafifçe öne çıkıp maviye döner.
+- Açılış görseli LOGOS Veli İzin'in kendi görseli oldu.
+- İlk deneme sürümündeki (0.1.1) her şey: tek tıkla veli izin dilekçesi, devamsızlık durumu, öğrenci belgesi, e-Okul'dan öğrenciler,
+  okul logosu, kayıtlar, istatistik, şifreli kasa.
+
 ## LOGOS Veli İzin 0.1.1 (03.11.2026) - ilk deneme sürümü
 
 - Veli izin dilekçesi tek tıkla: öğrenciyi arayın, veli kendiliğinden gelir (kayıtlı veli, anne, baba ya da "Diğer"), takvimden günleri

@@ -17,6 +17,10 @@ Tarih, komut, süre, sonuç, öğrenilen. Gerçek veriyle yapılanlar yalnız sa
 - Sonuç: `eokul.oku` üçünü de 'genel', kimlik listesini 'kimlik' tanıdı; bütün alanlar beklenenle aynı; boş bırakılan fotoğraf None.
 - Öğrenilen: gerçek düzeni taklit için çerçeve dikdörtgeni şart (`_bloklar` önce dikdörtgenlere bakıyor).
 
+## D6 - 03.11.2026 - Bir kez çıkan sınama başarısızlığı
+- Birim sınamaları 1.0.0 değişikliklerinden hemen sonra bir kez "FAILED (failures=1)" verdi (çıktı kaydedilmemişti); ardından 9 koşuda hep geçti.
+- Hangisi olduğu bilinmiyor. Aday: `kasa_sina.test_sure` (açma süresi < 5 sn, yük altında). Bir daha çıkarsa çıktı `/tmp/birim_*.txt`'ye alınır.
+
 ## D5 - 03.11.2026 - İlk Windows derlemesi (GitHub, windows-latest)
 - Sonuç: derleme ve paketin duman sınaması (pencere dahil) geçti: `LOGOS-Veli-Izin.exe` 27,8 MB, kurulum 29,4 MB (ikisi de sohbete
   gönderilebilir, sınır 30 MiB). "Kurulum paketini sına" adımı düştü; Actions günlüğü buluttan okunamıyor, yalnız "exit code 1".

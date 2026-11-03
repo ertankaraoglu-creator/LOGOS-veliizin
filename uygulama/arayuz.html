@@ -199,6 +199,30 @@
   @keyframes toast-omur { 0% { opacity:0; transform:translateY(8px) } 6%, 85% { opacity:1; transform:none } 100% { opacity:0 } } .toast { animation:toast-omur 4s forwards }
   .hk-satir { display:flex; gap:10px; align-items:center; padding:8px 0; border-top:1px solid #eef1f5; font-size:13.5px } .hk-satir:first-child { border-top:0 } .hk-satir .k { width:150px; color:var(--mute); flex:none }
   .yil-sec { display:inline-flex; align-items:center; gap:8px; font-size:13px; color:var(--ink2) } .yil-sec select { width:auto; padding:4px 8px; font-size:13px }
+  /* Fareyle üstüne gelince kutucuk hafifçe öne çıkar ve maviye döner (Ertan 03.11.2026: "biraz daha mavi ve belirgin, öne doğru boyutlansın").
+     Tıklanan küçük kutular büyür; içinde yazı yazılan büyük kartlar büyümez (yazarken kıpırdamasın), yalnız kenarı ve gölgesi mavileşir. */
+  .btn, .cip, .gun, .sayi, .snc, .kart, aside button, .tk-nav, .hk-dugme, .ogr-kart, table.liste tbody td {
+    transition:transform .16s cubic-bezier(.2,.8,.2,1), box-shadow .16s ease, background-color .16s ease, border-color .16s ease, color .16s ease }
+  @media (hover: hover) {
+    .btn:hover:not(:disabled) { transform:translateY(-1px) scale(1.04); background:#eaf1ff; border-color:#93b4f5; color:#1d4ed8; box-shadow:0 6px 16px -6px rgba(37,99,235,.45) }
+    .btn.p:hover:not(:disabled) { background:#1d4ed8; border-color:#1d4ed8; color:#fff; box-shadow:0 8px 20px -6px rgba(37,99,235,.65) }
+    .btn.d:hover:not(:disabled) { background:#fef2f2; border-color:#fca5a5; color:var(--err); box-shadow:0 6px 16px -6px rgba(185,28,28,.35) }
+    .btn.bag:hover:not(:disabled) { transform:none; background:none; box-shadow:none }
+    .cip:hover:not(:disabled) { transform:translateY(-1px) scale(1.06); background:#dbe7ff; border-color:var(--brand); color:#1d4ed8; box-shadow:0 6px 14px -6px rgba(37,99,235,.5) }
+    .cip.on:hover:not(:disabled) { background:#1d4ed8; color:#fff }
+    button.gun:hover { transform:scale(1.12); z-index:2; background:#dbe7ff; color:#1d4ed8; box-shadow:0 0 0 2px var(--brand) inset, 0 8px 18px -6px rgba(37,99,235,.55) }
+    button.gun.sec:not(.once):not(.sonra):hover { background:#1d4ed8; color:#fff }
+    .tk-nav:hover { transform:scale(1.12); background:#dbe7ff; color:var(--brand) }
+    .sayi:hover { transform:translateY(-3px) scale(1.02); background:#f6f9ff; border-color:#bfd3fb; box-shadow:0 14px 30px -12px rgba(37,99,235,.45) }
+    .snc:hover { transform:scale(1.015); background:#dbe7ff }
+    .kart:hover { border-color:#bfd3fb; box-shadow:0 2px 4px rgba(15,23,42,.04), 0 14px 32px -14px rgba(37,99,235,.38) }
+    section[data-sayfa=istatistik] .kart:hover { transform:translateY(-3px) }
+    .ogr-kart:hover { border-color:#a9c3f7; box-shadow:0 10px 24px -12px rgba(37,99,235,.45) }
+    aside button:not(.on):hover { transform:translateX(3px); background:rgba(37,99,235,.3); color:#fff }
+    aside .hk-dugme:hover { transform:translateX(2px) }
+    table.liste.tikla tbody tr:hover td { background:#e6efff }
+  }
+  @media (prefers-reduced-motion: reduce) { .btn, .cip, .gun, .sayi, .snc, .kart, aside button, .tk-nav, .hk-dugme { transition:none !important; transform:none !important } }
   @media (max-width:1100px) { .dk-duzen { grid-template-columns:1fr } .izgara3 { grid-template-columns:1fr } .izgara2 { grid-template-columns:1fr } .sayilar { grid-template-columns:repeat(2, minmax(0, 1fr)) } }
 </style>
 </head>
