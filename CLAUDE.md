@@ -101,8 +101,12 @@ ve LOGOS Disiplin'in (`../LOGOS DİSİPLİN/CLAUDE.md`) kuralları burada da ge�
 - Uyarılar kaydı engellemez (aynı güne önceki dilekçe, 5 iş günü geçmiş özür beyanı, devamsızlık sınırı): `izin_kaydet` önce `uyari_gerek`
   döner, arayüz sorar, `uyarilari_gordum` ile kaydeder. Engelleyen hata `{hata, alan}`; arayüz alanı kırmızı yapar.
 - Takvimde okul günü olmayan gün seçilemez (hafta sonu, resmî tatil, ara tatil, yaz, okulun kapalı günleri); Shift ile aralık.
-- Yazdırma: `belge.yazdir` Windows'ta `os.startfile(yol, 'print')`, Mac'te `lp`; olmazsa PDF açılır (`ayarlar.yazdirma`: yazici | ac).
-  **Okul bilgisayarında denenmedi** (sırada). Sınamada `LV_SINAMA=1` hiçbir program açmaz.
+- Yazdırma (Ertan 04.11.2026: "yazdırıyor ama kağıt A4 yatay çıkıyor"; Ayarlar'daki "Önce PDF açılsın"ı denedi, "işime yaradı, varsayılan
+  bu gelmeli"): `ayarlar.yazdirma` **'ac' varsayılan** (PDF sistemin okuyucusunda açılır, yazıcı / yön / kopya orada) | 'yazici' (`belge.yazdir`:
+  Windows'ta `os.startfile(yol, 'print')`, Mac'te `lp`; yazıcının kendi ayarlarıyla, okulda yatay çıktı; olmazsa PDF açılır). 1.0.0'ın kasası
+  'yazici' yazmıştı: `_acildi` bir kez 'ac'a çevirir (`meta.yazdirma_goc`), sonra kullanıcının seçtiği kalır. Uygulamanın içinde önizleme
+  (300 dpi resim + window.print, @page A4 dikey) denendi, ana koda girmedi: `deneme/onizleme` dalı, D8. Okulda denendi (04.11): doğrudan
+  yazdırma çalışıyor, kağıt yatay. Sınamada `LV_SINAMA=1` hiçbir program açmaz.
 - Arayüz kuralları Disiplin'deki gibi: `alert/confirm/prompt` yok (kendi `modal`), kaydeden düğmeler `birKez`, gecikmeli odak yok, pywebview
   Api'de durum `_ad` biçiminde, kilitliyken `{hata, kilit: true}` → kilit ekranı. `onclick` içinde tek tırnak + `esc` (çift tırnak JSON
   özniteliği bozuyordu, ui_duman ile bulundu).

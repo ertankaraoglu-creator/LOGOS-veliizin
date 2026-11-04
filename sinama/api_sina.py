@@ -99,6 +99,15 @@ class ApiSina(unittest.TestCase):
             with pdfplumber.open(y) as pp: return len(pp.pages[0].images)
         self.assertEqual(resim_say(A.izin_yazdir(id1)['pdf']), 1)
         A.ayar_kaydet({'logo_goster': False}); self.assertEqual(resim_say(A.izin_yazdir(id1)['pdf']), 0); A.ayar_kaydet({'logo_goster': True})
+        # ---- yazdırma (Ertan 04.11.2026: doğrudan yazdırmada kağıt A4 yatay çıkıyordu; varsayılan "önce PDF açılsın")
+        self.assertEqual(A.ayar_kaydet({})['ayarlar']['yazdirma'], 'ac'); self.assertEqual(A.izin_yazdir(id1)['yazdirma'], 'acildi')
+        A.ayar_kaydet({'yazdirma': 'yazici'}); self.assertEqual(A.izin_yazdir(id1)['yazdirma'], 'sinama')
+        self.assertEqual(A.ayar_kaydet({'yazdirma': 'baska'})['ayarlar']['yazdirma'], 'yazici')
+        A._kasa.veri['meta'].pop('yazdirma_goc', None); A._kasa.kaydet()                                       # 1.0.0'ın kasası ('yazici' yazılı)
+        A.kilitle(); A.kilit_ac(SIFRE); self.assertEqual(A.ayar_kaydet({})['ayarlar']['yazdirma'], 'ac')          # bir kez "önce PDF açılsın"a geçer
+        A.ayar_kaydet({'yazdirma': 'yazici'}); A.kilitle(); A.kilit_ac(SIFRE)
+        self.assertEqual(A.ayar_kaydet({})['ayarlar']['yazdirma'], 'yazici')                                   # sonra kullanıcının seçtiği kalır
+        A.ayar_kaydet({'yazdirma': 'ac'})
         # ---- öğrenci belgesi
         r = A.ogrenci_belgesi(1101, {}, yazdir=False); self.assertEqual(r['eksik'], ['tc'])                     # 11/C kimlik listesinde yok
         self.assertIn('hata', A.ogrenci_belgesi(1101, {'tc': '123', 'eksikleri_gordum': True}, yazdir=False))

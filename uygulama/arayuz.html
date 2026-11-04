@@ -1034,8 +1034,8 @@ function ayarlarCiz(){
       <div class="iki"><label class="alan"><span>Okul müdürü</span><input type="text" value="${esc(A.belge_mudur || '')}" onchange="ayar({belge_mudur: this.value})"></label><label class="alan"><span>Müdür yardımcısı</span><input type="text" value="${esc(A.belge_mudur_yrd || '')}" onchange="ayar({belge_mudur_yrd: this.value})"></label></div>
       <label class="alan" style="max-width:220px"><span>Burslu / Yatılı varsayılanı</span><input type="text" value="${esc(A.belge_burslu || '')}" onchange="ayar({belge_burslu: this.value})"></label></div>
     <div class="kart"><h3>Yazdırma</h3>
-      <label class="check"><input type="radio" name="yz" value="yazici" ${A.yazdirma !== 'ac' ? 'checked' : ''} onchange="ayar({yazdirma: 'yazici'})"> "Kaydet ve yazdır" PDF'i doğrudan varsayılan yazıcıya göndersin (gönderilemezse PDF açılır)</label>
-      <label class="check"><input type="radio" name="yz" value="ac" ${A.yazdirma === 'ac' ? 'checked' : ''} onchange="ayar({yazdirma: 'ac'})"> Önce PDF açılsın, yazdırmayı oradan yapayım</label></div>
+      <label class="check"><input type="radio" name="yz" value="ac" ${A.yazdirma !== 'yazici' ? 'checked' : ''} onchange="ayar({yazdirma: 'ac'})"> Önce PDF açılsın, yazdırmayı oradan yapayım (yazıcıyı, kağıdın yönünü ve kopya sayısını orada seçersiniz)</label>
+      <label class="check"><input type="radio" name="yz" value="yazici" ${A.yazdirma === 'yazici' ? 'checked' : ''} onchange="ayar({yazdirma: 'yazici'})"> Doğrudan varsayılan yazıcıya gönderilsin (yazıcının kendi ayarlarıyla; bazı yazıcılarda kağıt yatay çıkabilir)</label></div>
   </div>
   <div style="display:grid;gap:12px">
     <div class="kart"><h3>Öğretim yılı</h3>

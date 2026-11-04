@@ -4,8 +4,8 @@ Kasa dosyasının meta.uygulama'sı, arayüzdeki sürüm yazısı ve paketin ad�
 """
 AD = 'LOGOS Veli İzin'
 TAM_AD = 'LOGOS Veli İzin Dilekçesi'
-SURUM = '1.0.0'
-TARIH = '03.11.2026'
+SURUM = '1.0.1'
+TARIH = '04.11.2026'
 GELISTIRICI = 'Ertan Karaoğlu'
 TELIF = '© 2026 Ertan Karaoğlu'
 SITE = 'https://dersdagitim.com'            # öteki LOGOS uygulamaları (Hakkında; kurulumda AppPublisherURL)

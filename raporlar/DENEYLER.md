@@ -17,6 +17,16 @@ Tarih, komut, süre, sonuç, öğrenilen. Gerçek veriyle yapılanlar yalnız sa
 - Sonuç: `eokul.oku` üçünü de 'genel', kimlik listesini 'kimlik' tanıdı; bütün alanlar beklenenle aynı; boş bırakılan fotoğraf None.
 - Öğrenilen: gerçek düzeni taklit için çerçeve dikdörtgeni şart (`_bloklar` önce dikdörtgenlere bakıyor).
 
+## D8 - 04.11.2026 - Yazdırma: kağıt yatay çıkıyor (Ertan'ın okulu)
+- Bulgu (Ertan 09:53): "Kaydet ve yazdır" dilekçeyi ve öğrenci belgesini doğrudan yazıcıya gönderiyor, kağıt **A4 yatay** çıkıyor. PDF A4 dikey
+  (ReportLab `pagesize=A4`); `os.startfile(yol, 'print')` PDF'i okuyucunun "Yazdır" eylemine veriyor, okuyucu yazıcının varsayılan ayarıyla
+  basıyor: yön ve yazıcı seçimi görünmüyor.
+- Denenen (`deneme/onizleme` dalı, ana koda girmedi): uygulamanın içinde önizleme. Sayfalar pypdfium2 ile 300 dpi PNG (~0,1 sn, ~500 KB),
+  "Yazdır" `window.print()` ile sistemin yazıcı penceresi, `@page { size: A4 portrait; margin: 0 }`; Chromium'da yazdırma görünümü tek sayfa
+  A4 dikey. WebView2'de `window.print()`in yazıcı penceresini açtığı denenmedi.
+- Karar (Ertan 10:01): Ayarlar'daki "Önce PDF açılsın" işine yaradı; **varsayılan o**. Okuyucunun Yazdır penceresinde yazıcı, yön, kopya görünüyor.
+- Öğrenilen: doğrudan yazdırma okulun yazıcısına ve PDF okuyucusuna bağlı; varsayılan, kullanıcının yazıcı penceresini gördüğü yol olmalı.
+
 ## D7 - 03.11.2026 - Site görselleri ve iki arayüz hatası (deneyler/site_ekran.py)
 - Komut: `python3 -W ignore deneyler/site_ekran.py ../logos/site` (uydurma okul, 33 dilekçe, 5 belge; ~1,5 dk).
 - Görseller iki gerçek hatayı gösterdi: (1) ilk açılışta boş kâğıdın anteti "T.C. / Müdürlüğüne" (kâğıt kilit ekranının arkasında okul

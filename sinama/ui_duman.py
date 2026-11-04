@@ -173,6 +173,7 @@ def main(ekran_klasoru=None):
 
         # ---- ayarlar
         sayfa.click('aside button[data-sayfa=ayarlar]'); sayfa.wait_for_selector('#aKonu')
+        assert sayfa.locator('input[name=yz][value=ac]').is_checked()                                           # varsayılan: önce PDF açılsın
         sayfa.fill('#aKonu', 'İzin dilekçesi'); sayfa.press('#aKonu', 'Tab')
         sayfa.wait_for_function("fetch('/api/ozet', {method: 'POST', body: '[]'}).then(r => r.json()).then(j => j.ayarlar.dilekce_konu === 'İzin dilekçesi')")
         sayfa.fill('#aMetin', 'Bozuk cümle'); sayfa.press('#aMetin', 'Tab')

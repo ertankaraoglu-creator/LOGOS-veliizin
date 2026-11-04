@@ -1,3 +1,9 @@
+## LOGOS Veli İzin 1.0.1 (04.11.2026)
+
+- "Kaydet ve yazdır" artık önce PDF'i açar; yazdırırken yazıcıyı, kağıdın yönünü ve kopya sayısını görürsünüz. Doğrudan yazıcıya
+  göndermek isteyen Ayarlar › Yazdırma'dan seçebilir (bazı yazıcılarda kağıt yatay çıkıyordu).
+- Program ilk açıldığında boş dilekçenin başlığı okulun adıyla görünür; logo yüklenirken kırık resim simgesi çıkmaz.
+
 ## LOGOS Veli İzin 1.0.0 (03.11.2026)
 
 - Fareyle üstüne gelince düğmeler, takvim günleri, çipler ve sayı kutuları hafifçe öne çıkıp maviye döner.

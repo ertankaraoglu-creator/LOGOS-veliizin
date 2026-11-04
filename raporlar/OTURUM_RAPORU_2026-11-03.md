@@ -80,3 +80,8 @@ gizli): üç commit buluttan push edildi (Mac'teki commit'ler git paketiyle taş
 - Görseller `deneyler/site_ekran.py` ile; iki arayüz hatası buldu ve düzeltildi (D7; 8f018aa, 1505acb). Düzeltmeler 1.0.0 paketinde yok:
   bir sonraki sürümde gider (ilk açılışta boş kâğıt "T.C. / Müdürlüğüne" görünebilir, öğrenci seçilince düzelir).
 - İndirme bağlantısı deponun herkese açık olmasına bağlı; gizlenirse Disiplin'deki gibi ayrı bir açık indirme deposu gerekir.
+
+## Ek (04.11.2026 sabah) - okulda yazdırma
+- Ertan 09:53: dilekçe ve öğrenci belgesi doğrudan yazıcıdan çıkıyor ama kağıt A4 yatay. İstek: önizleme ya da yazıcı ayarları görünsün.
+- Uygulamanın içinde önizleme yazılmaya başlandı (`deneme/onizleme` dalı, D8). Ertan 10:01: Ayarlar'daki "Önce PDF açılsın" işine yaradı,
+  varsayılan bu olsun. Ana kodda varsayılan 'ac'; 1.0.0'ın kasası bir kez 'ac'a geçer. Sürüm 1.0.1 hazırlandı (yayın Ertan'ın sözüyle).

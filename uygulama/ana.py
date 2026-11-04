@@ -24,7 +24,9 @@ YAKINLIK = ('Anne', 'Baba', 'Vasi', 'Diğer')
 VARSAYILAN_AYARLAR = {'kilit_dakika': KILIT_DAKIKA, 'onay_kutusu': True, 'onay_ad': '', 'onay_unvan': 'Müdür Yardımcısı',
                       'belge_mudur': '', 'belge_mudur_yrd': '', 'belge_burslu': '- / -', 'dilekce_konu': IZ.VARSAYILAN_KONU,
                       'dilekce_metin': IZ.VARSAYILAN_METIN, 'logo_goster': True, 'kayit_no_goster': True, 'kapali_gunler': [],
-                      'sinir_ozursuz': 10, 'sinir_toplam': 30, 'fotograf': False, 'yazdirma': 'yazici'}
+                      'sinir_ozursuz': 10, 'sinir_toplam': 30, 'fotograf': False, 'yazdirma': 'ac'}
+# yazdirma: 'ac' önce PDF açılır, yazdırma okuyucudan (yazıcı, yön, kopya orada; varsayılan, Ertan 04.11.2026: doğrudan yazdırmada kağıt
+# A4 yatay çıkıyordu) | 'yazici' doğrudan varsayılan yazıcıya (yazıcının kendi ayarlarıyla)
 
 
 def yeni_veri(okul):
@@ -104,6 +106,10 @@ class Api:
         v = self._kasa.veri
         v.setdefault('ayarlar', {})
         for a, d in VARSAYILAN_AYARLAR.items(): v['ayarlar'].setdefault(a, d)       # eski kasaya yeni ayarlar
+        m = v.setdefault('meta', {})
+        if not m.get('yazdirma_goc'):                                   # 1.0.0'ın kasası 'yazici' yazmıştı: bir kez "önce PDF açılsın"a geçer
+            if v['ayarlar'].get('yazdirma') == 'yazici': v['ayarlar']['yazdirma'] = 'ac'
+            m['yazdirma_goc'] = True
         if not v.get('yil'): v['yil'] = isgunu.ogretim_yili()
         v.setdefault('yillar', {}).setdefault(v['yil'], yeni_yil_verisi())
 
