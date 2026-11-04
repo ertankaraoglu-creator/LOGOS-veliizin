@@ -85,3 +85,6 @@ gizli): üç commit buluttan push edildi (Mac'teki commit'ler git paketiyle taş
 - Ertan 09:53: dilekçe ve öğrenci belgesi doğrudan yazıcıdan çıkıyor ama kağıt A4 yatay. İstek: önizleme ya da yazıcı ayarları görünsün.
 - Uygulamanın içinde önizleme yazılmaya başlandı (`deneme/onizleme` dalı, D8). Ertan 10:01: Ayarlar'daki "Önce PDF açılsın" işine yaradı,
   varsayılan bu olsun. Ana kodda varsayılan 'ac'; 1.0.0'ın kasası bir kez 'ac'a geçer. Sürüm 1.0.1 hazırlandı (yayın Ertan'ın sözüyle).
+- Ertan 10:45 "onaylıyorum, yayınla". İlk derleme (3ac2e4b) paketin duman sınamasında durdu (D8); sınama düzeltildi, **v1.0.1 yayınlandı**
+  (f27d873): `LOGOS-Veli-Izin-kurulum.exe` 29,4 MB (sha256 a69cc773…), `LOGOS-Veli-Izin-windows.exe` 27,8 MB. Kurulum dosyası Ertan'a
+  gönderildi. Sitedeki yazdırma cümleleri "önce PDF açılır" oldu (LOGOS 7c6ca00).
