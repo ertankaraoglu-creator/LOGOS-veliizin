@@ -26,6 +26,9 @@ Tarih, komut, süre, sonuç, öğrenilen. Gerçek veriyle yapılanlar yalnız sa
   A4 dikey. WebView2'de `window.print()`in yazıcı penceresini açtığı denenmedi.
 - Karar (Ertan 10:01): Ayarlar'daki "Önce PDF açılsın" işine yaradı; **varsayılan o**. Okuyucunun Yazdır penceresinde yazıcı, yön, kopya görünüyor.
 - Öğrenilen: doğrudan yazdırma okulun yazıcısına ve PDF okuyucusuna bağlı; varsayılan, kullanıcının yazıcı penceresini gördüğü yol olmalı.
+- 1.0.1'in ilk derlemesi (3ac2e4b) paketin duman sınamasında durdu, sürüm açılmadı: `paket/duman.py` yazdırmanın 'sinama' (yazıcı yolu)
+  dönmesini bekliyordu. Artık varsayılanın 'acildi' olduğunu ve doğrudan yazdırma seçeneğini ayrı ayrı sınıyor. Kaynaktan da koşulabiliyor:
+  `python paket/duman.py <python -m uygulama.ana'yı açan betik>` (TAMAM, 04.11). Ders: varsayılan değişince paketin sınamasına da bakılır.
 
 ## D7 - 03.11.2026 - Site görselleri ve iki arayüz hatası (deneyler/site_ekran.py)
 - Komut: `python3 -W ignore deneyler/site_ekran.py ../logos/site` (uydurma okul, 33 dilekçe, 5 belge; ~1,5 dk).

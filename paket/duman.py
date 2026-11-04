@@ -108,7 +108,9 @@ def tarayici_sinamasi(exe, surum):
                     'gunler': {g[0]: 'tam', g[1]: 'sonra'}, 'neden_kodu': 'hastalik', 'neden': 'rahatsızlığı',
                     'devamsizlik': {'ozurlu': '4,5', 'ozursuz': '2'}, 'uyarilari_gordum': True}
             r = A('izin_kaydet', izin, True); iyi(r.get('ok') and r['no_metni'].endswith('/0001') and os.path.exists(r['pdf']), f"dilekçe {r.get('no_metni')} yazıldı")
-            iyi(r.get('yazdirma') == 'sinama', 'yazdırma sınamada yazıcıya gitmedi')
+            iyi(r.get('yazdirma') == 'acildi', 'varsayılan: önce PDF açılır (sınamada program açılmaz)')
+            A('ayar_kaydet', {'yazdirma': 'yazici'}); iyi(A('izin_yazdir', r['id']).get('yazdirma') == 'sinama', 'doğrudan yazdırma seçeneği (sınamada yazıcıya gitmez)')
+            A('ayar_kaydet', {'yazdirma': 'ac'})
             m = pdf_metni(r['pdf'])
             if m:
                 t, resim = m
