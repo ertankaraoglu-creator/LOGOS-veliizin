@@ -133,6 +133,20 @@ def main(ekran_klasoru=None):
         sayfa.click('#btnYazdir')
         sayfa.wait_for_selector('#mdEvet'); ekran.al(sayfa, 'dilekce-uyari'); sayfa.click('#mdEvet')
         sayfa.wait_for_selector('.toast:has-text("0002")')
+        # yazdırma önizlemesi (Ertan 04.11.2026: doğrudan yazdırmada kağıt A4 yatay çıkıyordu): sayfa resmi, Yazdır sistemin penceresini açar
+        sayfa.wait_for_selector('.p-kart.oniz .oniz-sayfalar img'); ekran.al(sayfa, 'yazdirma-onizleme')
+        expect(sayfa.locator('.p-kart.oniz h2')).to_have_text('Veli izin dilekçesi 2026-27/0002')
+        assert sayfa.locator('#baski img').count() == 1
+        sayfa.evaluate("window.__baski = 0; window.print = () => { window.__baski++ }")
+        sayfa.click('#onYazdir'); sayfa.wait_for_function('window.__baski === 1')
+        sayfa.keyboard.press('Control+p'); sayfa.wait_for_function('window.__baski === 2')                         # önizlemede Ctrl+P de yazdırır
+        baski = sayfa.pdf(prefer_css_page_size=True)                                                            # yazdırma görünümü: tek sayfa, A4 dikey
+        import io, pdfplumber
+        with pdfplumber.open(io.BytesIO(baski)) as bp:
+            assert len(bp.pages) == 1, len(bp.pages)
+            w, h = bp.pages[0].width, bp.pages[0].height; assert abs(w - 595.3) < 2 and abs(h - 841.9) < 2, (w, h)
+            assert len(bp.pages[0].images) == 1 and not (bp.pages[0].extract_text() or '').strip()                # yalnız dilekçenin resmi
+        sayfa.click('#onKapat'); sayfa.wait_for_selector('#modal', state='hidden'); assert sayfa.locator('#baski img').count() == 0
         expect(sayfa.locator('#kagit')).to_contain_text('öğrencinin teyzesi')
         expect(sayfa.locator('#kagit')).to_contain_text('0532 123 45 67')
 
@@ -156,13 +170,13 @@ def main(ekran_klasoru=None):
         sayfa.click('#ogTablo tbody tr:first-child button:text-is("Belge")')
         sayfa.wait_for_selector('#bTc'); ekran.al(sayfa, 'belge-eksik')
         sayfa.fill('#bTc', '10000000146'); sayfa.click('#bYaz')
-        sayfa.wait_for_selector('.toast:has-text("Öğrenci belgesi")')
+        sayfa.wait_for_selector('.p-kart.oniz h2:text-is("Öğrenci belgesi")'); sayfa.keyboard.press('Escape'); sayfa.wait_for_selector('#modal', state='hidden')
         sayfa.click('#ogTablo tbody tr:first-child'); sayfa.wait_for_selector('#opTc'); expect(sayfa.locator('#opTc')).to_have_value('10000000146')
         sayfa.click('#modal button:text-is("Vazgeç")')
         # 9A'lı öğrencinin her şeyi var → doğrudan belge
         sayfa.select_option('#ogSinif', sinif_secenegi(sayfa, '9A'))
         sayfa.click('#ogTablo tbody tr:first-child button:text-is("Belge")')
-        sayfa.wait_for_selector('.toast:has-text("Öğrenci belgesi")')
+        sayfa.wait_for_selector('.p-kart.oniz h2:text-is("Öğrenci belgesi")'); sayfa.click('#onKapat'); sayfa.wait_for_selector('#modal', state='hidden')
         sayfa.click('aside button[data-sayfa=kayitlar]'); sayfa.wait_for_selector('#kyBelgeler table')
         assert sayfa.locator('#kyBelgeler tbody tr').count() == 2
 
@@ -173,6 +187,7 @@ def main(ekran_klasoru=None):
 
         # ---- ayarlar
         sayfa.click('aside button[data-sayfa=ayarlar]'); sayfa.wait_for_selector('#aKonu')
+        assert sayfa.locator('input[name=yz][value=onizle]').is_checked()                                       # varsayılan: önizleme
         sayfa.fill('#aKonu', 'İzin dilekçesi'); sayfa.press('#aKonu', 'Tab')
         sayfa.wait_for_function("fetch('/api/ozet', {method: 'POST', body: '[]'}).then(r => r.json()).then(j => j.ayarlar.dilekce_konu === 'İzin dilekçesi')")
         sayfa.fill('#aMetin', 'Bozuk cümle'); sayfa.press('#aMetin', 'Tab')

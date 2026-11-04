@@ -24,7 +24,8 @@ YAKINLIK = ('Anne', 'Baba', 'Vasi', 'Diğer')
 VARSAYILAN_AYARLAR = {'kilit_dakika': KILIT_DAKIKA, 'onay_kutusu': True, 'onay_ad': '', 'onay_unvan': 'Müdür Yardımcısı',
                       'belge_mudur': '', 'belge_mudur_yrd': '', 'belge_burslu': '- / -', 'dilekce_konu': IZ.VARSAYILAN_KONU,
                       'dilekce_metin': IZ.VARSAYILAN_METIN, 'logo_goster': True, 'kayit_no_goster': True, 'kapali_gunler': [],
-                      'sinir_ozursuz': 10, 'sinir_toplam': 30, 'fotograf': False, 'yazdirma': 'yazici'}
+                      'sinir_ozursuz': 10, 'sinir_toplam': 30, 'fotograf': False, 'yazdirma': 'onizle'}
+YAZDIRMA = ('onizle', 'yazici', 'ac')   # önizleme ve yazıcı penceresi (varsayılan, Ertan 04.11.2026) | doğrudan yazıcıya | PDF açılsın
 
 
 def yeni_veri(okul):
@@ -104,6 +105,10 @@ class Api:
         v = self._kasa.veri
         v.setdefault('ayarlar', {})
         for a, d in VARSAYILAN_AYARLAR.items(): v['ayarlar'].setdefault(a, d)       # eski kasaya yeni ayarlar
+        m = v.setdefault('meta', {})
+        if not m.get('onizleme_goc'):                                   # 1.0.0'ın kasası 'yazici' yazmıştı: bir kez önizlemeye geçer
+            if v['ayarlar'].get('yazdirma') == 'yazici': v['ayarlar']['yazdirma'] = 'onizle'
+            m['onizleme_goc'] = True
         if not v.get('yil'): v['yil'] = isgunu.ogretim_yili()
         v.setdefault('yillar', {}).setdefault(v['yil'], yeni_yil_verisi())
 
@@ -373,7 +378,7 @@ class Api:
             d = int(g['kilit_dakika'])
             if d not in (0, 5, 10, 15, 30, 60): raise K.Hata('Geçersiz kilit süresi')
             a['kilit_dakika'] = d
-        if 'yazdirma' in g and g['yazdirma'] in ('yazici', 'ac'): a['yazdirma'] = g['yazdirma']
+        if 'yazdirma' in g and g['yazdirma'] in YAZDIRMA: a['yazdirma'] = g['yazdirma']
         if 'kapali_gunler' in g: a['kapali_gunler'] = isgunu.ek_duzelt(g['kapali_gunler'] or [])
         k.kaydet()
         return {'ok': True, 'ayarlar': self._ayarlar(), 'kasa': k.bilgi()}
@@ -614,7 +619,7 @@ class Api:
         yol = self._dilekce_pdf(kayit, o, s)
         k.kaydet()
         sonuc = {'ok': True, 'id': kayit['id'], 'no': kayit['no'], 'no_metni': kayit['no_metni'], 'pdf': yol, 'uyarilar': p['uyarilar']}
-        if yazdir: sonuc['yazdirma'] = self._yazdir(yol)
+        if yazdir: self._yazdir(yol, sonuc)
         return sonuc
 
     def _kayit_no(self, n, yil):
@@ -625,10 +630,25 @@ class Api:
         BL.dilekce(yol, self._okul(), self._ayarlar(), kayit, o, s, self._kasa.veri.get('okul_logo'))
         return yol
 
-    def _yazdir(self, yol):
-        if self._ayarlar().get('yazdirma') == 'ac':
-            BL.ac(yol); return 'acildi'
-        return BL.yazdir(yol)
+    def _yazdir(self, yol, sonuc):
+        """Ayara göre: önizleme (sayfaların resmi arayüze gider, yazıcı penceresini arayüz açar), doğrudan yazıcı ya da PDF'i açmak."""
+        y = self._ayarlar().get('yazdirma')
+        if y == 'onizle':
+            sonuc['yazdirma'] = 'onizle'; sonuc['onizleme'] = BL.onizleme(yol)
+        elif y == 'ac':
+            BL.ac(yol); sonuc['yazdirma'] = 'acildi'
+        else:
+            sonuc['yazdirma'] = BL.yazdir(yol)
+        return sonuc
+
+    @disari
+    def pdf_ac(self, yol):
+        """Önizlemedeki "PDF olarak aç": yalnız Belgeler klasöründeki bir PDF, sistemin okuyucusunda."""
+        self._acik(); self._dokun()
+        kok = os.path.realpath(BL.klasor()); y = os.path.realpath(str(yol or ''))
+        if not (y.startswith(kok + os.sep) and y.lower().endswith('.pdf') and os.path.isfile(y)): raise K.Hata('Belge bulunamadı')
+        if self._pencere is not None: BL.ac(y)
+        return {'ok': True, 'pdf': y}
 
     @disari
     def izin_yazdir(self, id):
@@ -637,7 +657,7 @@ class Api:
         if not kayit: raise K.Hata('Kayıt bulunamadı')
         o = self._ogr(kayit['ogrenci_no'], Y); s = self._sinif(o, Y)
         yol = self._dilekce_pdf(kayit, o, s)
-        return {'ok': True, 'pdf': yol, 'yazdirma': self._yazdir(yol)}
+        return self._yazdir(yol, {'ok': True, 'pdf': yol})
 
     @disari
     def izin_ac(self, id):
@@ -708,7 +728,7 @@ class Api:
         BL.ogrenci_belgesi(yol, self._okul(), a, o, s, tarih, kisi)
         k.kaydet()
         sonuc = {'ok': True, 'id': b['id'], 'pdf': yol}
-        if yazdir: sonuc['yazdirma'] = self._yazdir(yol)
+        if yazdir: self._yazdir(yol, sonuc)
         return sonuc
 
     @disari

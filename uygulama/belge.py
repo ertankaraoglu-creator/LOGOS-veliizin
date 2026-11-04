@@ -260,6 +260,24 @@ def ogrenci_belgesi(yol, okul, ayarlar, ogrenci, sinif, tarih, kisi=None):
 
 
 # ------------------------------------------------------------------ yazdırma ve açma
+def onizleme(yol, dpi=300):
+    """PDF'in sayfaları PNG data URL olarak: uygulamanın içindeki önizleme ve yazdırma (Ertan 04.11.2026: doğrudan yazdırmada kağıt
+    yatay çıkıyordu; "ön izleme çıksa, sonra yazdır desek, yazıcı ayarlarını görsek"). 300 dpi: yazıcıdan çıkınca yazı keskin kalır.
+    Arayüz bu resimleri A4 dikey sayfalara koyup yazıcı penceresini açar; sayfa yönü orada değişmez."""
+    import base64, io
+    import pypdfium2 as pdfium
+    L = []
+    pdf = pdfium.PdfDocument(yol)
+    try:
+        for s in pdf:
+            im = s.render(scale=dpi / 72).to_pil().convert('RGB')
+            b = io.BytesIO(); im.save(b, 'PNG', compress_level=1)
+            L.append('data:image/png;base64,' + base64.b64encode(b.getvalue()).decode())
+    finally:
+        pdf.close()
+    return L
+
+
 def yazdir(yol):
     """PDF'i varsayılan yazıcıya gönderir. Dönüş: 'yazici' (gönderildi), 'acildi' (gönderilemedi, PDF açıldı) ya da Hata.
     Sınamada (LV_SINAMA) hiçbir program açılmaz."""

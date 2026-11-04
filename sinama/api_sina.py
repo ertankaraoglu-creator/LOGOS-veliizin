@@ -99,6 +99,26 @@ class ApiSina(unittest.TestCase):
             with pdfplumber.open(y) as pp: return len(pp.pages[0].images)
         self.assertEqual(resim_say(A.izin_yazdir(id1)['pdf']), 1)
         A.ayar_kaydet({'logo_goster': False}); self.assertEqual(resim_say(A.izin_yazdir(id1)['pdf']), 0); A.ayar_kaydet({'logo_goster': True})
+        # ---- yazdırma önizlemesi (Ertan 04.11.2026: doğrudan yazdırmada kağıt A4 yatay çıkıyordu; "ön izleme çıksa, sonra yazdır desek")
+        import base64, io
+        from PIL import Image
+        self.assertEqual(A.ayar_kaydet({})['ayarlar']['yazdirma'], 'onizle')                                    # yeni kasada varsayılan
+        r = A.izin_yazdir(id1); self.assertEqual(r['yazdirma'], 'onizle'); self.assertEqual(len(r['onizleme']), 1)
+        im = Image.open(io.BytesIO(base64.b64decode(r['onizleme'][0].split(',', 1)[1]))); w, h = im.size
+        self.assertGreater(h, w); self.assertAlmostEqual(w / h, 210 / 297, places=2); self.assertGreaterEqual(w, 2400)   # A4 dikey, 300 dpi
+        self.assertTrue(A.pdf_ac(r['pdf'])['ok'])
+        for y in (A._yol, os.path.join(self.d, 'yok.pdf'), self.pdf['9A'], ''): self.assertIn('hata', A.pdf_ac(y), y)          # yalnız Belgeler'deki PDF
+        A.ayar_kaydet({'yazdirma': 'yazici'}); r = A.izin_yazdir(id1); self.assertEqual(r['yazdirma'], 'sinama'); self.assertNotIn('onizleme', r)
+        A.ayar_kaydet({'yazdirma': 'ac'}); self.assertEqual(A.izin_yazdir(id1)['yazdirma'], 'acildi')
+        self.assertEqual(A.ayar_kaydet({'yazdirma': 'baska'})['ayarlar']['yazdirma'], 'ac')
+        b = A.ogrenci_belgesi(901, {}, yazdir=True)
+        A.ayar_kaydet({'yazdirma': 'yazici'}); A._kasa.veri['meta'].pop('onizleme_goc', None); A._kasa.kaydet()   # 1.0.0'ın kasası
+        A.kilitle(); A.kilit_ac(SIFRE); self.assertEqual(A.ayar_kaydet({})['ayarlar']['yazdirma'], 'onizle')      # bir kez önizlemeye geçer
+        A.ayar_kaydet({'yazdirma': 'yazici'}); A.kilitle(); A.kilit_ac(SIFRE)
+        self.assertEqual(A.ayar_kaydet({})['ayarlar']['yazdirma'], 'yazici')                                   # sonra seçilen kalır
+        A.ayar_kaydet({'yazdirma': 'onizle'})
+        r = A.ogrenci_belgesi(901, {}, yazdir=True); self.assertEqual(r['yazdirma'], 'onizle'); self.assertEqual(len(r['onizleme']), 1)
+        A.belge_sil(b['id']); A.belge_sil(r['id'])
         # ---- öğrenci belgesi
         r = A.ogrenci_belgesi(1101, {}, yazdir=False); self.assertEqual(r['eksik'], ['tc'])                     # 11/C kimlik listesinde yok
         self.assertIn('hata', A.ogrenci_belgesi(1101, {'tc': '123', 'eksikleri_gordum': True}, yazdir=False))

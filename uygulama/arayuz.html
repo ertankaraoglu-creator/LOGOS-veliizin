@@ -223,6 +223,23 @@
     table.liste.tikla tbody tr:hover td { background:#e6efff }
   }
   @media (prefers-reduced-motion: reduce) { .btn, .cip, .gun, .sayi, .snc, .kart, aside button, .tk-nav, .hk-dugme { transition:none !important; transform:none !important } }
+  /* ---------------- yazdırma önizlemesi (Ertan 04.11.2026: doğrudan yazdırmada kağıt A4 yatay çıkıyordu; "ön izleme çıksa, sonra yazdır desek").
+     Sayfalar 300 dpi resim; #baski yalnız yazdırırken görünür, @page A4 dikey: yazıcı penceresinde yön değişmez. */
+  .p-kart.oniz { width:min(920px, 96vw); height:94vh; max-height:94vh; display:flex; flex-direction:column; padding:20px 24px 16px; overflow:hidden }
+  .oniz-bas { display:flex; align-items:center; gap:8px; flex-wrap:wrap } .oniz-bas h2 { margin:0; font-size:20px } .oniz-bas .bosluk { flex:1 }
+  .oniz-bas .btn svg { width:17px; height:17px }
+  .oniz-alt { font-size:13px; color:var(--ink2); margin:6px 0 12px }
+  .oniz-sayfalar { flex:1; min-height:0; overflow:auto; background:#e2e8f0; border-radius:14px; padding:22px; display:flex; flex-direction:column; align-items:center; gap:18px }
+  .oniz-sayfalar img { width:min(100%, 620px); height:auto; background:#fff; border-radius:2px; box-shadow:0 12px 32px -14px rgba(15,23,42,.55) }
+  #baski { display:none }
+  @page { size:A4 portrait; margin:0 }
+  @media print {
+    html, body { height:auto !important; overflow:visible !important; background:#fff !important; margin:0 !important; padding:0 !important; display:block !important }
+    body > *:not(#baski) { display:none !important }
+    #baski { display:block !important }
+    #baski img { display:block; width:210mm; height:296.8mm; margin:0; break-after:page; page-break-after:always }
+    #baski img:last-child { break-after:auto; page-break-after:auto }
+  }
   @media (max-width:1100px) { .dk-duzen { grid-template-columns:1fr } .izgara3 { grid-template-columns:1fr } .izgara2 { grid-template-columns:1fr } .sayilar { grid-template-columns:repeat(2, minmax(0, 1fr)) } }
 </style>
 </head>
@@ -459,6 +476,7 @@
 
 <div class="modal" id="modal" hidden></div>
 <div id="toasts" aria-live="polite"></div>
+<div id="baski" aria-hidden="true"></div>
 <input type="file" id="dosyaSecici" accept="image/png,image/jpeg" hidden>
 <div id="yazdir"></div>
 
@@ -490,7 +508,7 @@ function ileti(id, yazi, tur){ const e = $(id); if (!e) return; e.textContent = 
 function goz(b){ const i = b.parentElement.querySelector('input'); const g = i.type === 'password'; i.type = g ? 'text' : 'password'; b.textContent = g ? 'gizle' : 'göster'; i.focus(); }
 function toast(msg, tur){ const T = $('toasts'); const t = document.createElement('div'); t.className = 'toast' + (tur ? ' ' + tur : ''); t.textContent = msg; T.appendChild(t); while (T.children.length > 3) T.firstChild.remove(); t.addEventListener('animationend', () => t.remove()); setTimeout(() => t.remove(), 4500); }
 function modal(html){ const m = $('modal'); m.innerHTML = html; m.hidden = false; }
-function modalKapat(){ const m = $('modal'); m.hidden = true; m.innerHTML = ''; }
+function modalKapat(){ const m = $('modal'); m.hidden = true; m.innerHTML = ''; ONIZ = null; $('baski').innerHTML = ''; }
 function sor(baslik, metin, okYazi, tehlike){
   return new Promise(res => {
     modal(`<div class="p-kart dar"><h2>${esc(baslik)}</h2><p class="aciklama">${metin}</p><div class="p-alt"><span class="bosluk"></span><button class="btn" id="mdHayir">Vazgeç</button><button class="btn ${tehlike ? 'd' : 'p'}" id="mdEvet">${esc(okYazi || 'Tamam')}</button></div></div>`);
@@ -520,7 +538,7 @@ const tarihUzun = s => { const d = pd(s); return `${d.getDate()} ${AYLAR[d.getMo
 const pd = s => { const [y, m, d] = String(s).slice(0, 10).split('-').map(Number); return new Date(y, m - 1, d); };
 const iso = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 const addD = (s, n) => { const d = pd(s); d.setDate(d.getDate() + n); return iso(d); };
-let BAS = {}, OZ = {}, KIRLI = false, LOGO_VERI = null;
+let BAS = {}, OZ = {}, KIRLI = false, LOGO_VERI = null, ONIZ = null;   // ONIZ: açık yazdırma önizlemesi {pdf, sayfa}
 async function logoAl(){ if (LOGO_VERI === null){ const r = await api.cagir('okul_logo'); if (r.hata) return ''; LOGO_VERI = r.logo || ''; } return LOGO_VERI; }   // kilitliyken alınmaz, boş diye de saklanmaz
 let MESGUL = new Set();
 async function birKez(ad, fn){ if (MESGUL.has(ad)) return; MESGUL.add(ad); try { return await fn(); } finally { MESGUL.delete(ad); } }
@@ -846,7 +864,8 @@ async function kaydet(yazdir){
     }
     if (r.hata){ toast(r.hata, 'err'); if (r.alan) alanIsaretle(r.alan); return; }
     F.id = r.id; F.no_metni = r.no_metni; kirli(false); ozetCiz(ONZ); kagitCiz(ONZ);
-    toast(yazdir ? (r.yazdirma === 'yazici' ? `Kaydedildi (${r.no_metni}) ve yazıcıya gönderildi.` : `Kaydedildi (${r.no_metni}); PDF açıldı, oradan yazdırın.`) : `Kaydedildi (${r.no_metni}).`, 'ok');
+    if (yazdir && r.yazdirma === 'onizle'){ toast(`Kaydedildi (${r.no_metni}).`, 'ok'); onizlemeAc(r, 'Veli izin dilekçesi ' + r.no_metni); }
+    else toast(yazdir ? (r.yazdirma === 'yazici' ? `Kaydedildi (${r.no_metni}) ve yazıcıya gönderildi.` : `Kaydedildi (${r.no_metni}); PDF açıldı, oradan yazdırın.`) : `Kaydedildi (${r.no_metni}).`, 'ok');
     const oz = await api.cagir('ozet'); if (!oz.hata){ OZ = oz; ustBilgi(); }
     const o = await api.cagir('ogrenci', OGR.no); if (!o.hata){ OGR = o.ogrenci; }
   });
@@ -859,9 +878,34 @@ async function kayitAc(id){
   sayfa('dilekce'); await ogrenciSec(i.ogrenci_no, true); kirli(false); ozetCiz(ONZ);
 }
 document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p' && ONIZ){ e.preventDefault(); onizlemeYazdir(); return; }
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p' && SAYFA === 'dilekce' && $('modal').hidden && !$('ana').hidden){ e.preventDefault(); kaydet(true); }
   if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) && SAYFA === 'dilekce' && !$('ana').hidden){ e.preventDefault(); if (OGR) ogrenciDegistir(); else $('q').focus(); }
 });
+
+// ------------------------------------------------------------------ yazdırma önizlemesi (Ertan 04.11.2026)
+// Python sayfaları 300 dpi resim olarak verir (ayar 'onizle'). "Yazdır" sistemin yazıcı penceresini açar: yazıcı, kopya sayısı ve önizleme orada;
+// #baski'nin @page'i A4 dikey olduğu için kağıt yatay çıkmaz. Yazıcı penceresi açılmazsa "PDF olarak aç" ile okuyucunun Yazdır'ı kalır.
+function onizlemeAc(r, baslik){
+  const S = r.onizleme || [];
+  modal(`<div class="p-kart oniz" role="dialog" aria-label="Yazdırma önizlemesi"><div class="oniz-bas"><h2>${esc(baslik)}</h2><span class="bosluk"></span>
+    <button class="btn" id="onKapat">Kapat</button><button class="btn" id="onPdf">PDF olarak aç</button><button class="btn p" id="onYazdir"><svg viewBox="0 0 24 24"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg>Yazdır</button></div>
+    <p class="oniz-alt">Kağıt A4 dikey çıkar. Yazdır'a basınca yazıcı penceresi açılır; yazıcıyı ve kopya sayısını orada seçersiniz.</p>
+    <div class="oniz-sayfalar">${S.map((x, i) => `<img src="${x}" alt="${i + 1}. sayfa">`).join('')}</div></div>`);
+  ONIZ = {pdf: r.pdf, sayfa: S.length};
+  $('baski').innerHTML = S.map(x => `<img src="${x}" alt="">`).join('');
+  $('onKapat').onclick = modalKapat; $('onYazdir').onclick = onizlemeYazdir; $('onPdf').onclick = onizlemePdf; $('onYazdir').focus();
+}
+async function onizlemeYazdir(){
+  if (!ONIZ) return;
+  await Promise.all([...$('baski').querySelectorAll('img')].map(i => i.decode ? i.decode().catch(() => null) : null));
+  window.print();
+}
+async function onizlemePdf(){
+  if (!ONIZ) return;
+  const r = await api.cagir('pdf_ac', ONIZ.pdf); if (r.hata){ toast(r.hata, 'err'); return; }
+  if (!PENCERE) toast('PDF: ' + r.pdf, 'ok');
+}
 
 // ------------------------------------------------------------------ öğrenci belgesi
 async function ogrenciBelgesi(no, kisi){
@@ -869,7 +913,8 @@ async function ogrenciBelgesi(no, kisi){
     const r = await api.cagir('ogrenci_belgesi', no, kisi || {}, true);
     if (r.eksik){ belgeEksikPencere(no, r.ogrenci, r.eksik); return; }
     if (r.hata){ toast(r.hata, 'err'); return; }
-    modalKapat(); toast(r.yazdirma === 'yazici' ? 'Öğrenci belgesi yazıcıya gönderildi.' : 'Öğrenci belgesi PDF olarak açıldı; oradan yazdırın.', 'ok');
+    if (r.yazdirma === 'onizle') onizlemeAc(r, 'Öğrenci belgesi');
+    else { modalKapat(); toast(r.yazdirma === 'yazici' ? 'Öğrenci belgesi yazıcıya gönderildi.' : 'Öğrenci belgesi PDF olarak açıldı; oradan yazdırın.', 'ok'); }
     const oz = await api.cagir('ozet'); if (!oz.hata){ OZ = oz; ustBilgi(); }
   });
 }
@@ -910,7 +955,7 @@ async function kayitlarYukle(){
   $('kyBelgeler').innerHTML = !B.length ? '<div class="bos">Bu yıl verilen öğrenci belgesi yok.</div>' : `<table class="liste"><thead><tr><th>Sıra</th><th>Tarih</th><th>Öğrenci</th><th>Sınıf</th><th></th></tr></thead><tbody>` +
     B.map(x => `<tr><td class="nw">${x.no}</td><td class="nw">${esc(tarihTr(x.tarih))}</td><td><b>${esc(x.ogrenci.ad)}</b><span class="alt-satir">No ${esc(x.ogrenci.no)}</span></td><td class="nw">${esc(x.ogrenci.sinif_kisa || '')}</td><td class="nw sag"><button class="btn kucuk" onclick="ogrenciBelgesi('${esc(String(x.ogrenci_no))}')">Yeniden ver</button> <button class="btn kucuk d" onclick="belgeSil('${x.id}')">Sil</button></td></tr>`).join('') + '</tbody></table>';
 }
-async function kayitYazdir(id){ const r = await api.cagir('izin_yazdir', id); if (r.hata){ toast(r.hata, 'err'); return; } toast(r.yazdirma === 'yazici' ? 'Yazıcıya gönderildi.' : 'PDF açıldı; oradan yazdırın.', 'ok'); }
+async function kayitYazdir(id){ const r = await api.cagir('izin_yazdir', id); if (r.hata){ toast(r.hata, 'err'); return; } if (r.yazdirma === 'onizle'){ onizlemeAc(r, 'Veli izin dilekçesi'); return; } toast(r.yazdirma === 'yazici' ? 'Yazıcıya gönderildi.' : 'PDF açıldı; oradan yazdırın.', 'ok'); }
 async function kayitSil(id){ if (!(await sor('Kayıt silinsin mi?', 'Bu dilekçe kaydı kalıcı olarak silinecek; bu işlem geri alınamaz.', 'Kaydı sil', true))) return; const r = await api.cagir('izin_sil', id); if (r.hata){ toast(r.hata, 'err'); return; } if (F.id === id){ F.id = null; F.no_metni = null; } toast('Kayıt silindi.', 'ok'); kayitlarYukle(); const oz = await api.cagir('ozet'); if (!oz.hata){ OZ = oz; ustBilgi(); } }
 async function belgeSil(id){ if (!(await sor('Kayıt silinsin mi?', 'Verilen belgenin kaydı silinecek (PDF dosyası Belgeler klasöründe kalır).', 'Sil', true))) return; await api.cagir('belge_sil', id); kayitlarYukle(); }
 async function csvAl(yil){ const r = await api.cagir('istatistik_csv', yil || $('kyYil').value || OZ.yil); if (r.hata){ toast(r.hata, 'err'); return; } toast('Excel dosyası yazıldı: ' + r.dosya, 'ok'); }
@@ -1034,8 +1079,9 @@ function ayarlarCiz(){
       <div class="iki"><label class="alan"><span>Okul müdürü</span><input type="text" value="${esc(A.belge_mudur || '')}" onchange="ayar({belge_mudur: this.value})"></label><label class="alan"><span>Müdür yardımcısı</span><input type="text" value="${esc(A.belge_mudur_yrd || '')}" onchange="ayar({belge_mudur_yrd: this.value})"></label></div>
       <label class="alan" style="max-width:220px"><span>Burslu / Yatılı varsayılanı</span><input type="text" value="${esc(A.belge_burslu || '')}" onchange="ayar({belge_burslu: this.value})"></label></div>
     <div class="kart"><h3>Yazdırma</h3>
-      <label class="check"><input type="radio" name="yz" value="yazici" ${A.yazdirma !== 'ac' ? 'checked' : ''} onchange="ayar({yazdirma: 'yazici'})"> "Kaydet ve yazdır" PDF'i doğrudan varsayılan yazıcıya göndersin (gönderilemezse PDF açılır)</label>
-      <label class="check"><input type="radio" name="yz" value="ac" ${A.yazdirma === 'ac' ? 'checked' : ''} onchange="ayar({yazdirma: 'ac'})"> Önce PDF açılsın, yazdırmayı oradan yapayım</label></div>
+      <label class="check"><input type="radio" name="yz" value="onizle" ${!['yazici', 'ac'].includes(A.yazdirma) ? 'checked' : ''} onchange="ayar({yazdirma: 'onizle'})"> Önce önizleme gösterilsin; "Yazdır"la yazıcı penceresi açılsın (yazıcı ve kopya sayısı orada, kağıt A4 dikey)</label>
+      <label class="check"><input type="radio" name="yz" value="yazici" ${A.yazdirma === 'yazici' ? 'checked' : ''} onchange="ayar({yazdirma: 'yazici'})"> Doğrudan varsayılan yazıcıya gönderilsin (yazıcının kendi ayarlarıyla; bazı yazıcılarda yatay çıkabilir)</label>
+      <label class="check"><input type="radio" name="yz" value="ac" ${A.yazdirma === 'ac' ? 'checked' : ''} onchange="ayar({yazdirma: 'ac'})"> PDF açılsın, yazdırmayı oradan yapayım</label></div>
   </div>
   <div style="display:grid;gap:12px">
     <div class="kart"><h3>Öğretim yılı</h3>
